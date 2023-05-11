@@ -1,27 +1,20 @@
 #ifndef TRICKSHOT_H
 #define TRICKSHOT_H
 
-#include <string>
-typedef unsigned int uint; // probs move this into the same primary file as sprite and the string include
+#include "../utility.h"
+#include "../zmath.h"
 
 // * =======================
 // * Trick Shot Backend
 // * =======================
 
-// todo move to a primary file and include it for this file
-struct Sprite {
-    std::string filepath;
-    uint x = 0;
-    uint y = 0;
-    static const uint width = 16;
-    static const uint height = 16;
-};
+// todo handle graphics after adding the graphics library
 
 namespace TrickShot {
     struct Ball {
-        uint x, y; // coordinates in terms of pixels
-        uint xVel, yVel; // x and y velocity in terms of pixels
-        static const uint linearDamping = 0.9; // friction applied to the ball
+        ZMath::Vec2D pos; // ball's position in terms of pixels
+        ZMath::Vec2D vel; // ball's velocity in terms of pixels
+        static const float linearDamping = 0.9; // friction applied to the ball
         // todo test for an ideal linearDamping value
     };
 
@@ -39,40 +32,60 @@ namespace TrickShot {
             static const uint WIDTH = 20; // width of the board
             static const uint HEIGHT = 20; // height of the board
 
+            bool complete = 0; // has the stage been completed
+
+        private:
+            Sprite grid[HEIGHT][WIDTH];
+            Ball ball; // The ball the player shoots.
+            uint cupX, cupY; // cup's coordinates in terms of tile number.
+
+        public:
+            // Instantiate a stage object.
+            // This will randomly select one of the possible stages for the minigame.
+            Stage() : ball({0.0f, 0.0f}), cupX(4), cupY(12) {};
+
             /**
              * @brief Shoot the ball in the direction determined by the player releasing the mouse.
              * 
-             * @param mouseX X position of the mouse in pixels.
-             * @param mouseY Y position of the mouse in pixels.
-             * @return (bool) 1 if the shot made it in, 0 otherwise.
+             * @param mousePos Relative position of the mouse in terms of pixels.
              */
-            bool shoot(uint mouseX, uint mouseY);
+            void shoot(const ZMath::Vec2D &mousePos) {
+                ZMath::Vec2D diff = (ball.pos - mousePos) * 0.5f;
+                ZMath::Vec2D dir = diff.getSigns();
+
+                ball.vel.set(diff.x * dir.x, diff.y * dir.y);
+
+                // todo update with better values once testing can be done
+            };
 
             /**
              * @brief Update the position of the ball while its velocity is not 0.
              * 
-             * @return 1 while the velocity > 0 and 0 once the velocity reaches 0.
+             * @param dt The time step passed. This should be standardized by the physics engine for determinism.
+             * @return 1 while the magnitude of the velocity is greater than 0.35 and 0 once its magnitude reaches that cut-off.
              */
-            bool update() const;
+            bool update(float dt) {
+                // todo check for collisions using 2D raycasting v AABB
+                // todo check for when the ball would enter the cup (make it possible to bounce out)
+
+                ball.pos += ball.vel * dt * ball.linearDamping;
+                ball.vel *= ball.linearDamping;
+
+                return ball.vel.magSq() >= 0.125;
+            };
 
             /**
              * @brief Draw the power-bar and arrow while the player is readying his/her shot.
              * 
-             * @param mouseX X position of the mouse in pixels.
-             * @param mouseY Y position of the mouse in pixels.
+             * @param mousePos The relative position of the mouse in terms of pixels.
              */
-            void drawShootingUI(uint mouseX, uint mouseY) const;
+            void drawShootingUI(ZMath::Vec2D const &mousePos) const;
 
             /**
              * @brief Draw the tiles associated with the stage.
              * 
              */
             void draw() const;
-
-        private:
-            Sprite grid[HEIGHT][WIDTH];
-            Ball ball; // ball's coordinates in terms of pixels
-            uint cupX, cupY; // cup's coordinates in terms of tile number
     };
 }
 
