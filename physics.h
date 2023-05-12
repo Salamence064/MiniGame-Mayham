@@ -63,7 +63,7 @@ namespace Physics {
     // Determine if a ray intersects an AABB.
     // dist will be modified to equal the distance from the ray it hits the AABB.
     // dist is set to -1 if there is no intersection.
-    bool raycast(const Ray2D &ray, const AABB &aabb, float &dist) const {
+    bool raycast(const Ray2D &ray, const AABB &aabb, float &dist) {
         // ? We can determine the distance from the ray to a certain edge by dividing a select min or max vector component
         // ?  by the corresponding component from the unit directional vector.
         // ? We know if tMin > tMax, then we have no intersection and if tMax is negative the AABB is behind us and we do not have a hit.
@@ -71,10 +71,10 @@ namespace Physics {
         ZMath::Vec2D dirFrac(1.0f/ray.dir.x, 1.0f/ray.dir.y);
         ZMath::Vec2D min = aabb.getMin(), max = aabb.getMax();
 
-        float t1 = (min.x - ray.origin.x)*dirfrac.x;
-        float t2 = (max.x - ray.origin.x)*dirfrac.x;
-        float t3 = (min.y - ray.origin.y)*dirfrac.y;
-        float t4 = (max.y - ray.origin.y)*dirfrac.y;
+        float t1 = (min.x - ray.origin.x)*dirFrac.x;
+        float t2 = (max.x - ray.origin.x)*dirFrac.x;
+        float t3 = (min.y - ray.origin.y)*dirFrac.y;
+        float t4 = (max.y - ray.origin.y)*dirFrac.y;
 
         // tMin is the max of the mins and tMax is the min of the maxes
         float tMin = ZMath::max(ZMath::min(t1, t2), ZMath::min(t3, t4));
