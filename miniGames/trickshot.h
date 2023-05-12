@@ -38,7 +38,7 @@ namespace TrickShot {
         private:
             Sprite grid[HEIGHT][WIDTH];
             Ball ball; // The ball the player shoots.
-            uint cupX, cupY; // cup's coordinates in terms of tile number.
+            Physics::AABB cup; // AABB representing the cup. This should lay in one tile.
 
             Physics::AABB* walls; // List of walls the player can collide with.
             uint numWalls = 0; // number of walls
@@ -46,7 +46,7 @@ namespace TrickShot {
         public:
             // Instantiate a stage object.
             // This will randomly select one of the possible stages for the minigame.
-            Stage() : ball({0.0f, 0.0f}), cupX(4), cupY(12) {};
+            Stage() : ball({0.0f, 0.0f}), cup(ZMath::Vec2D(16.0f, 0.0f), ZMath::Vec2D(32.0f, 16.0f)) {};
 
             /**
              * @brief Shoot the ball in the direction determined by the player releasing the mouse.
@@ -88,10 +88,11 @@ namespace TrickShot {
                     }
                 }
 
-                // todo check for when the ball would enter the cup (make it possible to bounce out)
-                // todo slow the ball drastically if it bounces out though
-
-                
+                // todo test values for this (both the slowing and the lenience for letting it go in)
+                if (Physics::raycast(ray, cup, dist, yAxis) && dP >= dist) {
+                    if (ball.vel.magSq() <= 6.25) { complete = 1; return 0; }
+                    ball.vel *= 0.45;
+                }
 
                 ball.pos += dP;
                 ball.vel *= ball.linearDamping;
