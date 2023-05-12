@@ -1,6 +1,7 @@
 #ifndef TRICKSHOT_H
 #define TRICKSHOT_H
 
+#include <fstream>
 #include "../utility.h"
 #include "../physics.h"
 
@@ -44,9 +45,59 @@ namespace TrickShot {
             uint numWalls = 0; // number of walls
 
         public:
+            // todo add one more block type
+
+            /** 
+             * Symbol Legend:
+             * 
+             * space = nothing
+             * w = wall
+             * b = ball
+             * c = cup
+             * 
+             * Each can be followed by an RGB to shade it a different color in the format [r],[b],[g]
+             */
+
             // Instantiate a stage object.
             // This will randomly select one of the possible stages for the minigame.
-            Stage() : ball({0.0f, 0.0f}), cup(ZMath::Vec2D(16.0f, 0.0f), ZMath::Vec2D(32.0f, 16.0f)) {};
+            Stage() {
+                std::ifstream f("trickshot1.map");
+                std::string line;
+
+                for (uint i = 0; i < HEIGHT; ++i) {
+                    getline(f, line);
+
+                    for (uint j = 0; j < WIDTH; ++j) {
+                        if (line[j] == ' ') { continue; } // blank space
+
+                        std::string filepath = "";
+
+                        switch (line[j]) {
+                            case 'w': {
+                                filepath = "wall.png";
+                                break;
+                            }
+
+                            case 'b': {
+                                filepath = "ball.png";
+                                ball = {ZMath::Vec2D(j*16.0f, i*16.0f), ZMath::Vec2D(), ZMath::Vec2D()};
+                                break;
+                            }
+
+                            case 'c': {
+                                filepath = "cup.png";
+                                float x = j*16.0f, y = i*16.0f;
+                                cup = Physics::AABB(ZMath::Vec2D(x, y), ZMath::Vec2D(x + 16.0f, y + 16.0f));
+                                break;
+                            }
+                        }
+
+                        grid[i][j] = (Sprite) {filepath, j * 16.0f, i * 16.0f};
+
+                        // todo add in the RGB part of the parser
+                    }
+                }
+            };
 
             /**
              * @brief Shoot the ball in the direction determined by the player releasing the mouse.

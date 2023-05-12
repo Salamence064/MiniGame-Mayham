@@ -29,6 +29,8 @@ namespace Physics {
         public:
             ZMath::Vec2D pos; // center of the AABB
 
+            AABB() = default; // to make the compiler happy
+
             /**
              * @brief Create an unrotated rectangle.
              * 
