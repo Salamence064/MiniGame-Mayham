@@ -105,7 +105,7 @@ namespace Physics {
             return 0;
         }
 
-        yAxis = 
+        yAxis = tMin == t3 || tMin == t4;
 
         dist = tMin;
         return 1;
