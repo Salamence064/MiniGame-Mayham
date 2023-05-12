@@ -2,7 +2,7 @@
 #define TRICKSHOT_H
 
 #include "../utility.h"
-#include "../zmath.h"
+#include "../physics.h"
 
 // * =======================
 // * Trick Shot Backend
@@ -14,6 +14,7 @@ namespace TrickShot {
     struct Ball {
         ZMath::Vec2D pos; // ball's position in terms of pixels
         ZMath::Vec2D vel; // ball's velocity in terms of pixels
+        ZMath::Vec2D dir; // normalized direction of the ball -- cached for efficiency
         static const float linearDamping = 0.9; // friction applied to the ball
         // todo test for an ideal linearDamping value
     };
@@ -39,6 +40,9 @@ namespace TrickShot {
             Ball ball; // The ball the player shoots.
             uint cupX, cupY; // cup's coordinates in terms of tile number.
 
+            Physics::AABB* walls; // List of walls the player can collide with.
+            uint numWalls = 0; // number of walls
+
         public:
             // Instantiate a stage object.
             // This will randomly select one of the possible stages for the minigame.
@@ -54,6 +58,7 @@ namespace TrickShot {
                 ZMath::Vec2D dir = diff.getSigns();
 
                 ball.vel.set(diff.x * dir.x, diff.y * dir.y);
+                ball.dir.set(ball.vel.normalize());
 
                 // todo update with better values once testing can be done
             };
@@ -65,10 +70,30 @@ namespace TrickShot {
              * @return 1 while the magnitude of the velocity is greater than 0.35 and 0 once its magnitude reaches that cut-off.
              */
             bool update(float dt) {
-                // todo check for collisions using 2D raycasting v AABB
-                // todo check for when the ball would enter the cup (make it possible to bounce out)
+                float dP = ball.vel * dt * ball.vel;
+                float dist;
+                bool yAxis;
 
-                ball.pos += ball.vel * dt * ball.linearDamping;
+                Physics::Ray2D ray(ball.pos, ball.dir);
+
+                // ! This will currently not properly detect collisions due to the ordering of the AABBs mattering (due to break)
+                for (uint i = 0; i < numWalls; ++i) {
+                    if (Physics::raycast(ray, walls[i], dist, yAxis)) {
+                        if (dP >= dist) {
+                            if (yAxis) { ball.vel.x = -ball.vel.x; }
+                            else { ball.vel.y = -ball.vel.y; }
+                        }
+
+                        break;
+                    }
+                }
+
+                // todo check for when the ball would enter the cup (make it possible to bounce out)
+                // todo slow the ball drastically if it bounces out though
+
+                
+
+                ball.pos += dP;
                 ball.vel *= ball.linearDamping;
 
                 return ball.vel.magSq() >= 0.125;
@@ -81,10 +106,7 @@ namespace TrickShot {
              */
             void drawShootingUI(ZMath::Vec2D const &mousePos) const;
 
-            /**
-             * @brief Draw the tiles associated with the stage.
-             * 
-             */
+            // Draw the tiles associated with the stage.
             void draw() const;
     };
 }

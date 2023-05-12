@@ -60,10 +60,16 @@ namespace Physics {
     // * Raycasting
     // * ==================
 
-    // Determine if a ray intersects an AABB.
-    // dist will be modified to equal the distance from the ray it hits the AABB.
-    // dist is set to -1 if there is no intersection.
-    bool raycast(const Ray2D &ray, const AABB &aabb, float &dist) {
+    /**
+     * @brief Determine if a ray intersects an AABB.
+     * 
+     * @param ray 2D ray.
+     * @param aabb 2D AABB.
+     * @param dist Float to be modified to equal the distance from the ray until it hits the AABB. Will be set to -1 if no intersection.
+     * @param yAxis Bool to be modified to determine the axis of intersection. 1 = on the AABB's y-axis, 0 = x-axis. Junk value if no intersection.
+     * @return Is there an intersection? 1 = yes, 0 = no.
+     */
+    bool raycast(const Ray2D &ray, const AABB &aabb, float &dist, bool &yAxis) {
         // ? We can determine the distance from the ray to a certain edge by dividing a select min or max vector component
         // ?  by the corresponding component from the unit directional vector.
         // ? We know if tMin > tMax, then we have no intersection and if tMax is negative the AABB is behind us and we do not have a hit.
@@ -93,14 +99,19 @@ namespace Physics {
         }
 
         // ray's origin is inside of the AABB.
+        // We do not want collisions to occur inside of the AABB so we will return 0.
         if (tMin < 0) {
-            dist = tMax;
-            return 1;
+            dist = -1.0f;
+            return 0;
         }
+
+        yAxis = 
 
         dist = tMin;
         return 1;
     };
+
+    // todo add circle vs AABB as that might be better than the raycasting method
 }
 
 #endif // !PHYSICS_H
