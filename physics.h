@@ -121,7 +121,7 @@ namespace Physics {
     bool CircleAndAABB(const Circle &c, const AABB &a) {
         // ? Determine the closest point of the AABB to the Circle and check if its distance to the center is less than the radius.
 
-        ZMath::Vec2D closest(c.c);
+        ZMath::Vec2D closest = c.c;
         ZMath::Vec2D min = a.getMin(), max = a.getMax();
 
         closest = ZMath::clamp(closest, min, max);
@@ -131,7 +131,7 @@ namespace Physics {
     bool CircleAndBox2D(const Circle &c, const Box2D &b) {
         // ? Same as CircleAndAABB except we first rotate the circle into the box's local space.
 
-        ZMath::Vec2D closest(c.c - b.pos);
+        ZMath::Vec2D closest = c.c - b.pos;
         ZMath::Vec2D min = b.getLocalMin(), max = b.getLocalMax();
 
         closest = b.rot.transpose() * closest + b.pos;
