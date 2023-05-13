@@ -22,6 +22,16 @@ namespace Physics {
             Ray2D(const ZMath::Vec2D &origin, const ZMath::Vec2D &dir) : origin(origin), dir(dir) {};
     };
 
+    class Circle {
+        public:
+            ZMath::Vec2D c; // center
+            float r; // radius
+
+            Circle() = default; // to make the compiler happy (and make the program faster)
+
+            Circle(ZMath::Vec2D const &center, float radius) : c(center), r(radius) {};
+    };
+
     class AABB {
         private:
             ZMath::Vec2D halfsize; // half the size of the AABB
@@ -41,7 +51,7 @@ namespace Physics {
 
             ZMath::Vec2D getMin() const { return pos - halfsize; };
             ZMath::Vec2D getMax() const { return pos + halfsize; };
-            ZMath::Vec2D getHalfSize() const { return halfsize; };
+            ZMath::Vec2D getHalfsize() const { return halfsize; };
 
             // Get the vertices of the AABB.
             // Remember to call delete[] afterwards to free the memory.
@@ -55,6 +65,79 @@ namespace Physics {
 
                 return v;
             };
+    };
+
+    class Box2D {
+        private:
+            ZMath::Vec2D halfsize; // half the size of the Box2D
+
+        public:
+            ZMath::Vec2D pos;
+            float theta;
+            
+            // Rotation matrix of the Box2D.
+            // Rotate anything from this box's local space to global space.
+            // Cached for efficiency.
+            // todo test to make sure it's local to global and not the other way around.
+            ZMath::Mat2D rot;
+
+            Box2D() = default;
+
+            /**
+             * @brief Create a rotated rectangle.
+             * 
+             * @param min 
+             * @param max 
+             * @param theta 
+             */
+            Box2D(ZMath::Vec2D const &min, ZMath::Vec2D const &max, float theta) : 
+                    halfsize((max - min) * 0.5f), pos(min + halfsize), theta(theta) { rot = ZMath::Mat2D::rotationMat(theta); };
+
+            ZMath::Vec2D getLocalMin() const { return pos - halfsize; };
+            ZMath::Vec2D getLocalMax() const { return pos + halfsize; };
+            ZMath::Vec2D getHalfsize() const { return halfsize; };
+
+            // Get the vertices of the Box2D.
+            // Remember to call delete[] on it.
+            ZMath::Vec2D* getVertices() const {
+                ZMath::Vec2D* v = new ZMath::Vec2D[4];
+
+                v[0] = -halfsize;
+                v[1] = ZMath::Vec2D(-halfsize.x, halfsize.y);
+                v[2] = ZMath::Vec2D(halfsize.x, -halfsize.y);
+                v[3] = halfsize;
+
+                for (int i = 0; i < 4; ++i) { v[i] = rot * v[i] + pos; }
+
+                return v;
+            };
+    };
+
+
+    // * ===========================
+    // * Intersection Detection
+    // * ===========================
+
+    bool CircleAndAABB(const Circle &c, const AABB &a) {
+        // ? Determine the closest point of the AABB to the Circle and check if its distance to the center is less than the radius.
+
+        ZMath::Vec2D closest(c.c);
+        ZMath::Vec2D min = a.getMin(), max = a.getMax();
+
+        closest = ZMath::clamp(closest, min, max);
+        return closest.distSq(c.c) <= c.r*c.r;
+    };
+
+    bool CircleAndBox2D(const Circle &c, const Box2D &b) {
+        // ? Same as CircleAndAABB except we first rotate the circle into the box's local space.
+
+        ZMath::Vec2D closest(c.c - b.pos);
+        ZMath::Vec2D min = b.getLocalMin(), max = b.getLocalMax();
+
+        closest = b.rot.transpose() * closest + b.pos;
+        closest = ZMath::clamp(closest, min, max);
+
+        return closest.distSq(c.c) <= c.r*c.r;
     };
 
 
