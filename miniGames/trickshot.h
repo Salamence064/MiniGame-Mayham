@@ -131,8 +131,8 @@ namespace TrickShot {
                 for (uint i = 0; i < numWalls; ++i) {
                     if (Physics::raycast(ray, walls[i], dist, yAxis)) {
                         if (dP >= dist) {
-                            if (yAxis) { ball.vel.x = -ball.vel.x; }
-                            else { ball.vel.y = -ball.vel.y; }
+                            if (yAxis) { ball.vel.x = -ball.vel.x; ball.dir.x = -ball.dir.x; }
+                            else { ball.vel.y = -ball.vel.y; ball.dir.y = -ball.dir.y; }
                         }
 
                         break;
