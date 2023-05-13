@@ -121,7 +121,8 @@ namespace TrickShot {
              * @return 1 while the magnitude of the velocity is greater than 0.35 and 0 once its magnitude reaches that cut-off.
              */
             bool update(float dt) {
-                float dP = ball.vel * dt * ball.vel;
+                ZMath::Vec2D dP = ball.vel * dt;
+                float dPSq = dP.magSq();
                 float dist;
                 bool yAxis;
 
@@ -130,7 +131,7 @@ namespace TrickShot {
                 // ! This will currently not properly detect collisions due to the ordering of the AABBs mattering (due to break)
                 for (uint i = 0; i < numWalls; ++i) {
                     if (Physics::raycast(ray, walls[i], dist, yAxis)) {
-                        if (dP >= dist) {
+                        if (dPSq >= dist*dist) {
                             if (yAxis) { ball.vel.x = -ball.vel.x; ball.dir.x = -ball.dir.x; }
                             else { ball.vel.y = -ball.vel.y; ball.dir.y = -ball.dir.y; }
                         }
@@ -140,7 +141,7 @@ namespace TrickShot {
                 }
 
                 // todo test values for this (both the slowing and the lenience for letting it go in)
-                if (Physics::raycast(ray, cup, dist, yAxis) && dP >= dist) {
+                if (Physics::raycast(ray, cup, dist, yAxis) && dPSq >= dist*dist) {
                     if (ball.vel.magSq() <= 6.25) { complete = 1; return 0; }
                     ball.vel *= 0.45;
                 }
