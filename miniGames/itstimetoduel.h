@@ -1,10 +1,10 @@
-#ifndef ITS_TIME_TO_DUAL_H
-#define ITS_TIME_TO_DUAL_H
+#ifndef ITS_TIME_TO_DUEL_H
+#define ITS_TIME_TO_DUEL_H
 
 #include "../utility.h"
 #include "../physics.h"
 
-namespace Dual {
+namespace Duel {
     enum Event {
         PLAYER1_SWORD,
         PLAYER2_SWORD,
@@ -21,9 +21,18 @@ namespace Dual {
 
             int hp;
         
-            void attack(bool sword) const;
+            void attack(bool sword) const {
+                if (sword) {
+                    // ! Throw out the sword hurtbox
+                    return;
+                }
 
-            void update(float dt);
+                // ! Shoot out an arrow
+            };
+
+            void update(float dt) {
+
+            };
 
             void draw() const;
     };
@@ -54,4 +63,4 @@ namespace Dual {
     };
 };
 
-#endif // !ITS_TIME_TO_DUAL_H
+#endif // !ITS_TIME_TO_DUEL_H
