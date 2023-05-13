@@ -4,6 +4,8 @@
 #include "../utility.h"
 #include "../physics.h"
 
+// todo update to model the players' hitboxes with ellipses
+
 namespace Duel {
     enum Event {
         PLAYER1_SWORD,

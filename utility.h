@@ -1,6 +1,8 @@
 #ifndef UTILITY_H
 #define UTILITY_H
 
+// todo maybe add coins in each mini-game that would allow for the player to buy cosmetics from the main menu
+
 #include <string>
 typedef unsigned int uint;
 
