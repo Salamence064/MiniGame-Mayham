@@ -12,6 +12,9 @@
 // todo handle graphics after adding the graphics library
 
 namespace TrickShot {
+    // todo setup a radius for the ball
+    // todo factor in the ball's radius into the calculations for reversing its velocity (for both x and y vels)
+
     struct Ball {
         ZMath::Vec2D pos; // ball's position in terms of pixels
         ZMath::Vec2D vel; // ball's velocity in terms of pixels
