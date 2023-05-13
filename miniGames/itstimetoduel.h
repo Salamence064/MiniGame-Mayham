@@ -21,6 +21,7 @@ namespace Duel {
 
             Physics::Circle hitbox; // Circle representing the hitbox of the player.
 
+            std::string filepath; // Filepath for the sprite of the player.
             int hp; // todo test for good hp values
         
             Player(const ZMath::Vec2D &pos);
@@ -65,6 +66,6 @@ namespace Duel {
             // Draw the tiles associated with the stage.
             void draw() const;
     };
-};
+}
 
 #endif // !ITS_TIME_TO_DUEL_H
