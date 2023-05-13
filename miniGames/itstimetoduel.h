@@ -19,8 +19,12 @@ namespace Duel {
             ZMath::Vec2D pos;
             ZMath::Vec2D vel;
 
-            int hp;
+            Physics::Circle hitbox; // Circle representing the hitbox of the player.
+
+            int hp; // todo test for good hp values
         
+            Player(const ZMath::Vec2D &pos);
+
             void attack(bool sword) const {
                 if (sword) {
                     // ! Throw out the sword hurtbox
