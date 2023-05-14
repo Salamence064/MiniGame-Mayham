@@ -6,6 +6,7 @@
 
 namespace SpinToWin {
     // todo either make 3D prespectived or 2D top-down
+    // todo update players to use ellipses
 
     enum Dir {
         UP,
@@ -20,10 +21,11 @@ namespace SpinToWin {
 
             ZMath::Vec2D vel = ZMath::Vec2D();
             ZMath::Vec2D pos;
+            Physics::Circle hitbox;
 
-            Player(const ZMath::Vec2D &pos) : pos(pos) {};
+            Player(const ZMath::Vec2D &pos) : pos(pos), hitbox(Physics::Circle(pos, 8.0f)) {};
 
-            void update(float dt);
+            void update(float dt) { pos += vel * dt; };
 
             void draw() const;
     };
@@ -50,7 +52,7 @@ namespace SpinToWin {
             Sprite grid[HEIGHT][WIDTH];
             Player player1, player2;
 
-            float bounceBack; // todo test for a good value
+            float bounceBack = 24.0f; // todo test for a good value
 
         public:
             Stage();
@@ -139,7 +141,22 @@ namespace SpinToWin {
                 }
             };
 
-            void update(float dt);
+            void update(float dt) {
+                // todo add checks to make sure the player is not falling off the stage
+
+                player1.update(dt);
+                player2.update(dt);
+
+                // check for collisions between the players
+                // todo later add a check for who is more in the direction of the collision and apply more bounceback to the person less so 
+                // (get the collision normal and dot it with the player's vel, the greater value is the one that has more in the same direction)
+                if (Physics::CircleAndCircle(player1.hitbox, player2.hitbox)) {
+                    // todo update it in the direction of the collision normal, too
+                    // this is just temp code as this would not work
+                    player1.pos -= bounceBack;
+                    player2.pos -= bounceBack;
+                }
+            };
 
             void draw() const;
     };

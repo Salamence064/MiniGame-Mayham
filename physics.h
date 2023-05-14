@@ -118,6 +118,11 @@ namespace Physics {
     // * Intersection Detection
     // * ===========================
 
+    bool CircleAndCircle(const Circle &c1, const Circle &c2) {
+        float r = c1.r + c2.r;
+        return c1.c.distSq(c2.c) <= r*r;
+    };
+
     bool CircleAndAABB(const Circle &c, const AABB &a) {
         // ? Determine the closest point of the AABB to the Circle and check if its distance to the center is less than the radius.
 
