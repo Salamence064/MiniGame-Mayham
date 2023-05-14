@@ -15,10 +15,10 @@ namespace SpinToWin {
     };
 
     class Player {
-        private:
-            ZMath::Vec2D vel = ZMath::Vec2D();
-
         public:
+            static const float speed = 7.5f;
+
+            ZMath::Vec2D vel = ZMath::Vec2D();
             ZMath::Vec2D pos;
 
             Player(const ZMath::Vec2D &pos) : pos(pos) {};
@@ -56,7 +56,88 @@ namespace SpinToWin {
             Stage();
 
             // player: 0 = P1, 1 = P2
-            void move(bool player, Dir dir);
+            void move(bool player, Dir dir) {
+                if (player) { // P2
+                    switch(dir) {
+                        case Dir::UP: {
+                            player2.vel.y = Player::speed;
+                            break;
+                        }
+
+                        case Dir::RIGHT: {
+                            player2.vel.x = Player::speed;
+                            break;
+                        }
+
+                        case Dir::DOWN: {
+                            player2.vel.y = -Player::speed;
+                            break;
+                        }
+
+                        case Dir::LEFT: {
+                            player2.vel.x = -Player::speed;
+                            break;
+                        }
+                    }
+
+                    return;
+                }
+
+                // P1
+                switch(dir) {
+                    case Dir::UP: {
+                        player1.vel.y = Player::speed;
+                        break;
+                    }
+
+                    case Dir::RIGHT: {
+                        player1.vel.x = Player::speed;
+                        break;
+                    }
+
+                    case Dir::DOWN: {
+                        player1.vel.y = -Player::speed;
+                        break;
+                    }
+
+                    case Dir::LEFT: {
+                        player1.vel.x = -Player::speed;
+                        break;
+                    }
+                }
+            };
+
+            // player: 0 = P1, 1 = P2
+            void stop(bool player, Dir dir) {
+                if (player) { // P2
+                    switch(dir) {
+                        case Dir::UP:
+                        case Dir::DOWN:
+                            player2.vel.y = 0;
+                            break;
+
+                        case Dir::RIGHT:
+                        case Dir::LEFT:
+                            player2.vel.x = 0;
+                            break;
+                    }
+
+                    return;
+                }
+
+                // P1
+                switch(dir) {
+                    case Dir::UP:
+                    case Dir::DOWN:
+                        player1.vel.y = 0;
+                        break;
+
+                    case Dir::RIGHT:
+                    case Dir::LEFT:
+                        player1.vel.x = 0;
+                        break;
+                }
+            };
 
             void update(float dt);
 
