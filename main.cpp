@@ -1,5 +1,8 @@
 // ? Main file to manage menus, graphics, and string together mini-games.
 
+// todo in CFlags line in makefile with -std=c++20 add -O3 and remove -Wall for the finished version (add -s too)
+// todo remove -g and -O0, too
+
 #include "raylib.h"
 
 #if defined(PLATFORM_WEB)
