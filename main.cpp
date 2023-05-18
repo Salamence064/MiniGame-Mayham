@@ -9,30 +9,6 @@
     #include <emscripten/emscripten.h>
 #endif
 
-// * Mini games
-// todo could probably use a templated list
-// todo could just use a struct, too
-TrickShot::Stage* trickShotStage = new TrickShot::Stage();
-ZMath::Vec2D trickshotOffset(740.0f, 290.0f);
-
-// Update and draw game frame
-void UpdateDrawFrame() {
-    // * Update
-    
-
-
-    // * Draw
-    BeginDrawing();
-
-        ClearBackground(BLACK);
-
-        trickShotStage->draw(trickshotOffset);
-
-        DrawFPS(10, 10);
-
-    EndDrawing();
-};
-
 int main() {
     // Initialization
     static const int screenWidth = 1800;
@@ -40,14 +16,34 @@ int main() {
 
     InitWindow(screenWidth, screenHeight, "Mini-Game Mayham");
 
+    // ! Could use templated list or structs to make this storage a bit better
+    TrickShot::Stage trickShotStage = TrickShot::Stage();
+    ZMath::Vec2D trickshotOffset(740.0f, 290.0f);
+
     #if defined(PLATFORM_WEB)
         emscripten_set_main_loop(UpdateDrawFrame, 60, 1);
     #else
+
         // Main game loop
-        while (!WindowShouldClose()) { UpdateDrawFrame(); }
+        while (!WindowShouldClose()) {
+            // * Update
+    
+
+
+            // * Draw
+            BeginDrawing();
+
+                ClearBackground(BLACK);
+
+                trickShotStage.draw(trickshotOffset);
+
+                DrawFPS(10, 10);
+
+            EndDrawing();
+        }
+
     #endif
 
-    delete trickShotStage;    
     CloseWindow();
     return 0;
 };

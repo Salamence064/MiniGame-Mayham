@@ -75,14 +75,14 @@ namespace TrickShot {
                 for (uint i = 0; i < HEIGHT; ++i) {
                     getline(f, line);
 
+                    Image image;
+
                     for (uint j = 0; j < WIDTH; ++j) {
                         if (line[j] == ' ') { grid[i][j].exists = 0; continue; } // blank space
 
-                        Image image;
-
                         switch (line[j]) {
                             case 'w': {
-                                image = LoadImage("miniGames/resources/trickshot/wall.png");
+                                image = LoadImage("miniGames/resources/trickshot/ball.png");
                                 break;
                             }
 
@@ -110,7 +110,7 @@ namespace TrickShot {
                         grid[i][j].height = 16;
 
                         UnloadImage(image);
-                        
+
                         // todo add in the RGB part of the parser (this will be done in terms of tint)
                     }
                 }
@@ -180,15 +180,13 @@ namespace TrickShot {
             void draw(const ZMath::Vec2D &offset) const {
                 for (uint i = 0; i < HEIGHT; ++i) {
                     for (uint j = 0; j < WIDTH; ++j) {
-                        if (grid[i][j].exists) {
-                            DrawTexture(grid[i][j].texture, j*16 + offset.x, i*16 + offset.y, WHITE);
-                            DrawRectangleLines(j*16 + offset.x, i*16 + offset.y, 16, 16, WHITE);
-                        }
+                        if (grid[i][j].exists) { DrawTexture(grid[i][j].texture, j*16 + offset.x, i*16 + offset.y, WHITE); }
                     }
                 }
             };
 
             // Unload the Textures
+            // todo probs make this into a function instead of the destructor
             ~Stage() {
                 for (uint i = 0; i < HEIGHT; ++i) {
                     for (uint j = 0; j < WIDTH; ++j) {
