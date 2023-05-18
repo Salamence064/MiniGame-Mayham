@@ -3,90 +3,50 @@
 // todo in CFlags line in makefile with -std=c++20 add -O3 and remove -Wall for the finished version (add -s too)
 // todo remove -g and -O0, too
 
-#include "raylib.h"
+#include "miniGames/trickshot.h"
 
 #if defined(PLATFORM_WEB)
     #include <emscripten/emscripten.h>
 #endif
 
-//----------------------------------------------------------------------------------
-// Local Variables Definition (local to this module)
-//----------------------------------------------------------------------------------
-Camera camera = { 0 };
-Vector3 cubePosition = { 0 };
-
-//----------------------------------------------------------------------------------
-// Local Functions Declaration
-//----------------------------------------------------------------------------------
-static void UpdateDrawFrame(void);          // Update and draw one frame
-
-//----------------------------------------------------------------------------------
-// Main entry point
-//----------------------------------------------------------------------------------
-int main()
-{
-    // Initialization
-    //--------------------------------------------------------------------------------------
-    const int screenWidth = 800;
-    const int screenHeight = 450;
-
-    InitWindow(screenWidth, screenHeight, "raylib");
-
-    camera.position = (Vector3){ 10.0f, 10.0f, 8.0f };
-    camera.target = (Vector3){ 0.0f, 0.0f, 0.0f };
-    camera.up = (Vector3){ 0.0f, 1.0f, 0.0f };
-    camera.fovy = 60.0f;
-    camera.projection = CAMERA_PERSPECTIVE;
-
-    //--------------------------------------------------------------------------------------
-
-#if defined(PLATFORM_WEB)
-    emscripten_set_main_loop(UpdateDrawFrame, 60, 1);
-#else
-    SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
-    //--------------------------------------------------------------------------------------
-
-    // Main game loop
-    while (!WindowShouldClose())    // Detect window close button or ESC key
-    {
-        UpdateDrawFrame();
-    }
-#endif
-
-    // De-Initialization
-    //--------------------------------------------------------------------------------------
-    CloseWindow();                  // Close window and OpenGL context
-    //--------------------------------------------------------------------------------------
-
-    return 0;
-}
+// * Mini games
+// todo could probably use a templated list
+// todo could just use a struct, too
+TrickShot::Stage trickShotStage = TrickShot::Stage();
+ZMath::Vec2D trickshotOffset(740.0f, 290.0f);
 
 // Update and draw game frame
-static void UpdateDrawFrame(void)
-{
-    // Update
-    //----------------------------------------------------------------------------------
-    UpdateCamera(&camera);
-    //----------------------------------------------------------------------------------
+static void UpdateDrawFrame() {
+    // * Update
+    
 
-    // Draw
-    //----------------------------------------------------------------------------------
+
+    // * Draw
     BeginDrawing();
 
-        ClearBackground(RAYWHITE);
+        ClearBackground(BLACK);
 
-        BeginMode3D(camera);
-
-            DrawCube(cubePosition, 2.0f, 2.0f, 2.0f, RED);
-            DrawCubeWires(cubePosition, 2.0f, 2.0f, 2.0f, MAROON);
-            DrawGrid(10, 1.0f);
-
-        EndMode3D();
-
-        DrawText("This is a raylib example", 10, 40, 20, DARKGRAY);
+        trickShotStage.draw(trickshotOffset);
 
         DrawFPS(10, 10);
 
     EndDrawing();
-    //----------------------------------------------------------------------------------
-}
+};
+
+int main() {
+    // Initialization
+    static const int screenWidth = 1800;
+    static const int screenHeight = 900;
+
+    InitWindow(screenWidth, screenHeight, "Mini-Game Mayham");
+
+    #if defined(PLATFORM_WEB)
+        emscripten_set_main_loop(UpdateDrawFrame, 60, 1);
+    #else
+        // Main game loop
+        while (!WindowShouldClose()) { UpdateDrawFrame(); }
+    #endif
+
+    CloseWindow();
+    return 0;
+};

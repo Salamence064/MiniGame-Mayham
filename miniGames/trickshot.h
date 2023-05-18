@@ -19,7 +19,7 @@ namespace TrickShot {
         ZMath::Vec2D pos; // ball's position in terms of pixels
         ZMath::Vec2D vel; // ball's velocity in terms of pixels
         ZMath::Vec2D dir; // normalized direction of the ball -- cached for efficiency
-        static const float linearDamping = 0.9; // friction applied to the ball
+        float linearDamping = 0.9; // friction applied to the ball
         // todo test for an ideal linearDamping value
     };
 
@@ -49,6 +49,8 @@ namespace TrickShot {
 
         public:
             // todo add one more block type
+            // todo Add rule of three stuff but with GPU commands called instead of memory ones. 
+                // todo Rule of 5 Not applicable as there isn't a move operator for the GPU stuff.
 
             /** 
              * Symbol Legend:
@@ -64,7 +66,7 @@ namespace TrickShot {
             // Instantiate a stage object.
             // This will randomly select one of the possible stages for the minigame.
             Stage() {
-                std::ifstream f("trickshot1.map");
+                std::ifstream f("resources/trickshot/maps/map1.map");
                 std::string line;
 
                 for (uint i = 0; i < HEIGHT; ++i) {
@@ -73,29 +75,42 @@ namespace TrickShot {
                     for (uint j = 0; j < WIDTH; ++j) {
                         if (line[j] == ' ') { continue; } // blank space
 
-                        std::string filepath = "";
+                        Image image;
 
                         switch (line[j]) {
                             case 'w': {
-                                filepath = "wall.png";
-                                break;
+                                image = LoadImage("resources/trickshot/wall.png");
+                                goto LOAD;
                             }
 
                             case 'b': {
-                                filepath = "ball.png";
+                                image = LoadImage("resources/trickshot/ball.png");
                                 ball = {ZMath::Vec2D(j*16.0f, i*16.0f), ZMath::Vec2D(), ZMath::Vec2D()};
-                                break;
+                                goto LOAD;
                             }
 
                             case 'c': {
-                                filepath = "cup.png";
+                                image = LoadImage("resources/trickshot/cup.png");
                                 float x = j*16.0f, y = i*16.0f;
                                 cup = Physics::AABB(ZMath::Vec2D(x, y), ZMath::Vec2D(x + 16.0f, y + 16.0f));
-                                break;
+                                goto LOAD;
+                            }
+
+                            default: {
+                                grid[i][j].exists = 0;
+                                goto SKIP;
                             }
                         }
 
-                        grid[i][j] = (Sprite) {filepath, j * 16.0f, i * 16.0f};
+                        SKIP: { continue; }
+
+                        LOAD: {
+                            ImageResize(&image, 16, 16);
+                            Texture2D text = LoadTextureFromImage(image);
+                            UnloadImage(image);
+
+                            grid[i][j] = (Sprite) {1, text, j * 16, i * 16, 16, 16};
+                        }
 
                         // todo add in the RGB part of the parser
                     }
@@ -163,7 +178,23 @@ namespace TrickShot {
             void drawShootingUI(ZMath::Vec2D const &mousePos) const;
 
             // Draw the tiles associated with the stage.
-            void draw() const;
+            void draw(const ZMath::Vec2D &offset) const {
+                for (uint i = 0; i < HEIGHT; ++i) {
+                    for (uint j = 0; j < WIDTH; ++j) {
+                        // todo debug sprites not rendering to the screen
+                        if (grid[i][j].exists) { DrawTexture(grid[i][j].texture, j*16 + offset.x, i*16 + offset.y, WHITE); }
+                    }
+                }
+            };
+
+            // Unload the Textures
+            ~Stage() {
+                for (uint i = 0; i < HEIGHT; ++i) {
+                    for (uint j = 0; j < WIDTH; ++j) {
+                        if (grid[i][j].exists) { UnloadTexture(grid[i][j].texture); }
+                    }
+                }
+            };
     };
 }
 

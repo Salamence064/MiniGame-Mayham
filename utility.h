@@ -3,15 +3,18 @@
 
 // todo maybe add coins in each mini-game that would allow for the player to buy cosmetics from the main menu
 
+#include "raylib.h" // for graphics
 #include <string>
 typedef unsigned int uint;
 
 struct Sprite {
-    std::string filepath;
-    uint x = 0;
-    uint y = 0;
-    static const uint width = 16;
-    static const uint height = 16;
+    bool exists;
+
+    Texture2D texture;
+    uint x;
+    uint y;
+    uint width;
+    uint height;
 };
 
 #endif // !UTILITY_H
