@@ -9,7 +9,10 @@ namespace ZMath {
     // * ============================================
 
     // * Pi constant
-    #define PI 3.1415926535897932L
+    // Set up like this as Raylib defines PI already
+    #ifndef PI
+        #define PI 3.1415926535897932L
+    #endif
 
     // * Default tolerance value for a floating point comparison
     #define EPSILON 0.0005

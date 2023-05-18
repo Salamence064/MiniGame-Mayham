@@ -1,6 +1,7 @@
 #ifndef TRICKSHOT_H
 #define TRICKSHOT_H
 
+#include <iostream> // !debugging
 #include <fstream>
 #include "../utility.h"
 #include "../physics.h"
@@ -41,6 +42,7 @@ namespace TrickShot {
 
         private:
             Sprite grid[HEIGHT][WIDTH];
+            
             Ball ball; // The ball the player shoots.
             Physics::AABB cup; // AABB representing the cup. This should lay in one tile.
 
@@ -66,53 +68,50 @@ namespace TrickShot {
             // Instantiate a stage object.
             // This will randomly select one of the possible stages for the minigame.
             Stage() {
-                std::ifstream f("resources/trickshot/maps/map1.map");
+                std::ifstream f("miniGames/resources/trickshot/maps/map1.map");
+
                 std::string line;
 
                 for (uint i = 0; i < HEIGHT; ++i) {
                     getline(f, line);
 
                     for (uint j = 0; j < WIDTH; ++j) {
-                        if (line[j] == ' ') { continue; } // blank space
+                        if (line[j] == ' ') { grid[i][j].exists = 0; continue; } // blank space
 
                         Image image;
 
                         switch (line[j]) {
                             case 'w': {
-                                image = LoadImage("resources/trickshot/wall.png");
-                                goto LOAD;
+                                image = LoadImage("miniGames/resources/trickshot/wall.png");
+                                break;
                             }
 
                             case 'b': {
-                                image = LoadImage("resources/trickshot/ball.png");
+                                image = LoadImage("miniGames/resources/trickshot/ball.png");
                                 ball = {ZMath::Vec2D(j*16.0f, i*16.0f), ZMath::Vec2D(), ZMath::Vec2D()};
-                                goto LOAD;
+                                break;
                             }
 
                             case 'c': {
-                                image = LoadImage("resources/trickshot/cup.png");
+                                image = LoadImage("miniGames/resources/trickshot/cup.png");
                                 float x = j*16.0f, y = i*16.0f;
                                 cup = Physics::AABB(ZMath::Vec2D(x, y), ZMath::Vec2D(x + 16.0f, y + 16.0f));
-                                goto LOAD;
-                            }
-
-                            default: {
-                                grid[i][j].exists = 0;
-                                goto SKIP;
+                                break;
                             }
                         }
 
-                        SKIP: { continue; }
+                        ImageResize(&image, 16, 16);
 
-                        LOAD: {
-                            ImageResize(&image, 16, 16);
-                            Texture2D text = LoadTextureFromImage(image);
-                            UnloadImage(image);
+                        // Add the information for the sprite
+                        // Note we do not need to set x, y as the matrix tells us the positions for us (since we have uniform tiles)
+                        grid[i][j].exists = 1;
+                        grid[i][j].texture = LoadTextureFromImage(image);
+                        grid[i][j].width = 16;
+                        grid[i][j].height = 16;
 
-                            grid[i][j] = (Sprite) {1, text, j * 16, i * 16, 16, 16};
-                        }
-
-                        // todo add in the RGB part of the parser
+                        UnloadImage(image);
+                        
+                        // todo add in the RGB part of the parser (this will be done in terms of tint)
                     }
                 }
             };
@@ -181,8 +180,10 @@ namespace TrickShot {
             void draw(const ZMath::Vec2D &offset) const {
                 for (uint i = 0; i < HEIGHT; ++i) {
                     for (uint j = 0; j < WIDTH; ++j) {
-                        // todo debug sprites not rendering to the screen
-                        if (grid[i][j].exists) { DrawTexture(grid[i][j].texture, j*16 + offset.x, i*16 + offset.y, WHITE); }
+                        if (grid[i][j].exists) {
+                            DrawTexture(grid[i][j].texture, j*16 + offset.x, i*16 + offset.y, WHITE);
+                            DrawRectangleLines(j*16 + offset.x, i*16 + offset.y, 16, 16, WHITE);
+                        }
                     }
                 }
             };

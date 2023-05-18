@@ -12,11 +12,11 @@
 // * Mini games
 // todo could probably use a templated list
 // todo could just use a struct, too
-TrickShot::Stage trickShotStage = TrickShot::Stage();
+TrickShot::Stage* trickShotStage = new TrickShot::Stage();
 ZMath::Vec2D trickshotOffset(740.0f, 290.0f);
 
 // Update and draw game frame
-static void UpdateDrawFrame() {
+void UpdateDrawFrame() {
     // * Update
     
 
@@ -26,7 +26,7 @@ static void UpdateDrawFrame() {
 
         ClearBackground(BLACK);
 
-        trickShotStage.draw(trickshotOffset);
+        trickShotStage->draw(trickshotOffset);
 
         DrawFPS(10, 10);
 
@@ -47,6 +47,7 @@ int main() {
         while (!WindowShouldClose()) { UpdateDrawFrame(); }
     #endif
 
+    delete trickShotStage;    
     CloseWindow();
     return 0;
 };
