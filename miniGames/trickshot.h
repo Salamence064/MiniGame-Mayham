@@ -17,10 +17,11 @@ namespace TrickShot {
     // todo factor in the ball's radius into the calculations for reversing its velocity (for both x and y vels)
 
     struct Ball {
+        Texture2D texture; // texture for the ball's sprite
         ZMath::Vec2D pos; // ball's position in terms of pixels
         ZMath::Vec2D vel; // ball's velocity in terms of pixels
         ZMath::Vec2D dir; // normalized direction of the ball -- cached for efficiency
-        float linearDamping = 0.9; // friction applied to the ball
+        float linearDamping = 0.98f; // friction applied to the ball
         // todo test for an ideal linearDamping value
     };
 
@@ -35,12 +36,13 @@ namespace TrickShot {
         public:
             // width = numCols
             // height = numRows
-            static const uint WIDTH = 20; // width of the board
-            static const uint HEIGHT = 20; // height of the board
+            static const uint WIDTH = 50; // width of the board
+            static const uint HEIGHT = 50; // height of the board
 
             bool complete = 0; // has the stage been completed
 
         private:
+            // todo also do not store the ball's pos in the grid and draw it separately
             Sprite grid[HEIGHT][WIDTH];
             
             Ball ball; // The ball the player shoots.
@@ -49,11 +51,16 @@ namespace TrickShot {
             Physics::AABB* walls; // List of walls the player can collide with.
             uint numWalls = 0; // number of walls
 
-        public:
-            // todo add one more block type
-            // todo Add rule of three stuff but with GPU commands called instead of memory ones. 
-                // todo Rule of 5 Not applicable as there isn't a move operator for the GPU stuff.
+        public:          
+            Stage() {};
 
+            // * Do not allow for the creation of the Stage objects through copy constructors or copy assignment operators.
+
+            Stage(Stage const &stage) { throw std::runtime_error("TrickShot::Stage objects CANNOT be created from another TrickShot::Stage object."); };
+            
+            Stage& operator = (Stage const &Stage) { throw std::runtime_error("TrickShot::Stage objcts CANNOT be assigned or reassigned with '='."); };
+
+            // todo add one more block type
             /** 
              * Symbol Legend:
              * 
@@ -65,9 +72,9 @@ namespace TrickShot {
              * Each can be followed by an RGB to shade it a different color in the format [r],[b],[g]
              */
 
-            // Instantiate a stage object.
+            // Initialize a stage for the trickshot minigame.
             // This will randomly select one of the possible stages for the minigame.
-            Stage() {
+            void init() {
                 std::ifstream f("miniGames/resources/trickshot/maps/map1.map");
 
                 std::string line;
@@ -78,8 +85,6 @@ namespace TrickShot {
                     Image image;
 
                     for (uint j = 0; j < WIDTH; ++j) {
-                        if (line[j] == ' ') { grid[i][j].exists = 0; continue; } // blank space
-
                         switch (line[j]) {
                             case 'w': {
                                 image = LoadImage("miniGames/resources/trickshot/ball.png");
@@ -88,8 +93,10 @@ namespace TrickShot {
 
                             case 'b': {
                                 image = LoadImage("miniGames/resources/trickshot/ball.png");
-                                ball = {ZMath::Vec2D(j*16.0f, i*16.0f), ZMath::Vec2D(), ZMath::Vec2D()};
-                                break;
+                                ImageResize(&image, 16, 16);
+                                ball = {LoadTextureFromImage(image), ZMath::Vec2D(j*16.0f, i*16.0f), ZMath::Vec2D(), ZMath::Vec2D()};
+                                grid[i][j].exists = 0;
+                                continue;
                             }
 
                             case 'c': {
@@ -97,6 +104,11 @@ namespace TrickShot {
                                 float x = j*16.0f, y = i*16.0f;
                                 cup = Physics::AABB(ZMath::Vec2D(x, y), ZMath::Vec2D(x + 16.0f, y + 16.0f));
                                 break;
+                            }
+
+                            default: {
+                                grid[i][j].exists = 0;
+                                continue;
                             }
                         }
 
@@ -121,11 +133,8 @@ namespace TrickShot {
              * 
              * @param mousePos Relative position of the mouse in terms of pixels.
              */
-            void shoot(const ZMath::Vec2D &mousePos) {
-                ZMath::Vec2D diff = (ball.pos - mousePos) * 0.5f;
-                ZMath::Vec2D dir = diff.getSigns();
-
-                ball.vel.set(diff.x * dir.x, diff.y * dir.y);
+            void shoot(const ZMath::Vec2D &dm) {
+                ball.vel.set(dm);
                 ball.dir.set(ball.vel.normalize());
 
                 // todo update with better values once testing can be done
@@ -135,7 +144,7 @@ namespace TrickShot {
              * @brief Update the position of the ball while its velocity is not 0.
              * 
              * @param dt The time step passed. This should be standardized by the physics engine for determinism.
-             * @return 1 while the magnitude of the velocity is greater than 0.35 and 0 once its magnitude reaches that cut-off.
+             * @return 0 while the magnitude of the velocity is greater than the cut-off and 1 once its magnitude reaches that cut-off.
              */
             bool update(float dt) {
                 ZMath::Vec2D dP = ball.vel * dt;
@@ -166,7 +175,12 @@ namespace TrickShot {
                 ball.pos += dP;
                 ball.vel *= ball.linearDamping;
 
-                return ball.vel.magSq() >= 0.125;
+                if (ball.vel.magSq() <= 100.0f) {
+                    ball.vel.zero();
+                    return 1;
+                }
+
+                return 0;
             };
 
             /**
@@ -183,6 +197,8 @@ namespace TrickShot {
                         if (grid[i][j].exists) { DrawTexture(grid[i][j].texture, j*16 + offset.x, i*16 + offset.y, WHITE); }
                     }
                 }
+
+                DrawTexture(ball.texture, offset.x + ball.pos.x, offset.y + ball.pos.y, WHITE);
             };
 
             // Unload the Textures
@@ -193,6 +209,8 @@ namespace TrickShot {
                         if (grid[i][j].exists) { UnloadTexture(grid[i][j].texture); }
                     }
                 }
+
+                UnloadTexture(ball.texture);
             };
     };
 }
