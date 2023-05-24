@@ -51,6 +51,8 @@ namespace TrickShot {
             Physics::AABB* walls; // List of walls the player can collide with.
             uint numWalls = 0; // number of walls
 
+            ZMath::Vec2D offset; // offset to center the stage in the screen
+
         public:          
             Stage() {};
 
@@ -74,10 +76,17 @@ namespace TrickShot {
 
             // Initialize a stage for the trickshot minigame.
             // This will randomly select one of the possible stages for the minigame.
-            void init() {
+            void init(ZMath::Vec2D const &offset) {
+                this->offset = offset;
+
                 std::ifstream f("miniGames/resources/trickshot/maps/map1.map");
 
                 std::string line;
+
+                getline(f, line);
+                numWalls = std::stoi(line);
+                walls = new Physics::AABB[numWalls];
+                int temp = 0; // temp index for the walls
 
                 for (uint i = 0; i < HEIGHT; ++i) {
                     getline(f, line);
@@ -88,13 +97,18 @@ namespace TrickShot {
                         switch (line[j]) {
                             case 'w': {
                                 image = LoadImage("miniGames/resources/trickshot/ball.png");
+                                if (i && j && i != HEIGHT - 1 && j != WIDTH - 1) {
+                                    float x = j*16.0f, y = i*16.0f;
+                                    walls[temp++] = Physics::AABB(offset + ZMath::Vec2D(x, y), offset + ZMath::Vec2D(x + 16.0f, y + 16.0f));
+                                }
+
                                 break;
                             }
 
                             case 'b': {
                                 image = LoadImage("miniGames/resources/trickshot/ball.png");
                                 ImageResize(&image, 16, 16);
-                                ball = {LoadTextureFromImage(image), ZMath::Vec2D(j*16.0f, i*16.0f), ZMath::Vec2D(), ZMath::Vec2D()};
+                                ball = {LoadTextureFromImage(image), offset + ZMath::Vec2D(j*16.0f, i*16.0f), ZMath::Vec2D(), ZMath::Vec2D()};
                                 grid[i][j].exists = 0;
                                 continue;
                             }
@@ -102,7 +116,7 @@ namespace TrickShot {
                             case 'c': {
                                 image = LoadImage("miniGames/resources/trickshot/cup.png");
                                 float x = j*16.0f, y = i*16.0f;
-                                cup = Physics::AABB(ZMath::Vec2D(x, y), ZMath::Vec2D(x + 16.0f, y + 16.0f));
+                                cup = Physics::AABB(offset + ZMath::Vec2D(x, y), offset + ZMath::Vec2D(x + 16.0f, y + 16.0f));
                                 break;
                             }
 
@@ -126,6 +140,11 @@ namespace TrickShot {
                         // todo add in the RGB part of the parser (this will be done in terms of tint)
                     }
                 }
+
+                walls[temp++] = Physics::AABB(offset + ZMath::Vec2D(), offset + ZMath::Vec2D(WIDTH*16.0f, 0.0f));
+                walls[temp++] = Physics::AABB(offset + ZMath::Vec2D(), offset + ZMath::Vec2D(0.0f, HEIGHT*16.0f));
+                walls[temp++] = Physics::AABB(offset + ZMath::Vec2D(0.0f, HEIGHT*16.0f), offset + ZMath::Vec2D(WIDTH*16.0f, HEIGHT*16.0f));
+                walls[temp++] = Physics::AABB(offset + ZMath::Vec2D(WIDTH*16.0f, 0.0f), offset + ZMath::Vec2D(WIDTH*16.0f, HEIGHT*16.0f));
             };
 
             /**
@@ -155,6 +174,7 @@ namespace TrickShot {
                 Physics::Ray2D ray(ball.pos, ball.dir);
 
                 // ! This will currently not properly detect collisions due to the ordering of the AABBs mattering (due to break)
+                // todo current thing breaking it
                 for (uint i = 0; i < numWalls; ++i) {
                     if (Physics::raycast(ray, walls[i], dist, yAxis)) {
                         if (dPSq >= dist*dist) {
@@ -191,14 +211,14 @@ namespace TrickShot {
             void drawShootingUI(ZMath::Vec2D const &mousePos) const;
 
             // Draw the tiles associated with the stage.
-            void draw(const ZMath::Vec2D &offset) const {
+            void draw() const {
                 for (uint i = 0; i < HEIGHT; ++i) {
                     for (uint j = 0; j < WIDTH; ++j) {
                         if (grid[i][j].exists) { DrawTexture(grid[i][j].texture, j*16 + offset.x, i*16 + offset.y, WHITE); }
                     }
                 }
 
-                DrawTexture(ball.texture, offset.x + ball.pos.x, offset.y + ball.pos.y, WHITE);
+                DrawTexture(ball.texture, ball.pos.x, ball.pos.y, WHITE);
             };
 
             // Unload the Textures

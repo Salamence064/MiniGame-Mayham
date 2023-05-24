@@ -11,7 +11,6 @@
 
 // todo use a list to make the storage a bit better
 TrickShot::Stage trickShotStage = TrickShot::Stage();
-ZMath::Vec2D trickshotOffset(500.0f, 50.0f);
 
 int main() {
     // Initialization
@@ -20,7 +19,7 @@ int main() {
 
     InitWindow(screenWidth, screenHeight, "Mini-Game Mayham");
 
-    trickShotStage.init();
+    trickShotStage.init(ZMath::Vec2D(500.0f, 50.0f));
 
     #if defined(PLATFORM_WEB)
         emscripten_set_main_loop(UpdateDrawFrame, 60, 1);
@@ -63,7 +62,7 @@ int main() {
 
                 ClearBackground(BLACK);
 
-                trickShotStage.draw(trickshotOffset);
+                trickShotStage.draw();
 
                 DrawFPS(10, 10);
 
