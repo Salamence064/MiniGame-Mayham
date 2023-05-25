@@ -168,7 +168,6 @@ namespace TrickShot {
             bool update(float dt) {
                 ZMath::Vec2D n;
 
-                // todo some of the wall collisions look slight janky -- fix
                 for (uint i = 0; i < numWalls; ++i) {
                     if (Physics::CircleAndAABB(ball.hitbox, walls[i], n)) {                        
                         if (std::fabs(n.x) > std::fabs(n.y)) {
