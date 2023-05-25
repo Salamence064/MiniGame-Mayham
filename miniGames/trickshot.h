@@ -18,9 +18,8 @@ namespace TrickShot {
 
     struct Ball {
         Texture2D texture; // texture for the ball's sprite
-        ZMath::Vec2D pos; // ball's position in terms of pixels
+        Physics::Circle hitbox; // Circle representing the ball.
         ZMath::Vec2D vel; // ball's velocity in terms of pixels
-        ZMath::Vec2D dir; // normalized direction of the ball -- cached for efficiency
         float linearDamping = 0.98f; // friction applied to the ball
         // todo test for an ideal linearDamping value
     };
@@ -52,6 +51,8 @@ namespace TrickShot {
             uint numWalls = 0; // number of walls
 
             ZMath::Vec2D offset; // offset to center the stage in the screen
+
+            bool canHit = 0; // used to determine if the ball can hit the cup
 
         public:          
             Stage() {};
@@ -108,7 +109,7 @@ namespace TrickShot {
                             case 'b': {
                                 image = LoadImage("miniGames/resources/trickshot/ball.png");
                                 ImageResize(&image, 16, 16);
-                                ball = {LoadTextureFromImage(image), offset + ZMath::Vec2D(j*16.0f, i*16.0f), ZMath::Vec2D(), ZMath::Vec2D()};
+                                ball = {LoadTextureFromImage(image), Physics::Circle(offset + ZMath::Vec2D(j*16.0f + 8.0f, i*16.0f + 8.0f), 8.0f), ZMath::Vec2D()};
                                 grid[i][j].exists = 0;
                                 continue;
                             }
@@ -150,13 +151,11 @@ namespace TrickShot {
             /**
              * @brief Shoot the ball in the direction determined by the player releasing the mouse.
              * 
-             * @param mousePos Relative position of the mouse in terms of pixels.
+             * @param dm Change in the position of the mouse since it was pressed down.
              */
-            void shoot(const ZMath::Vec2D &dm) {
+            inline void shoot(const ZMath::Vec2D &dm) {
                 ball.vel.set(dm);
-                ball.dir.set(ball.vel.normalize());
-
-                // todo update with better values once testing can be done
+                canHit = 1;
             };
 
             /**
@@ -166,33 +165,31 @@ namespace TrickShot {
              * @return 0 while the magnitude of the velocity is greater than the cut-off and 1 once its magnitude reaches that cut-off.
              */
             bool update(float dt) {
-                ZMath::Vec2D dP = ball.vel * dt;
-                float dPSq = dP.magSq();
-                float dist;
-                bool yAxis;
+                ZMath::Vec2D n;
 
-                Physics::Ray2D ray(ball.pos, ball.dir);
-
-                // ! This will currently not properly detect collisions due to the ordering of the AABBs mattering (due to break)
-                // todo current thing breaking it
+                // todo some of the wall collisions look slight janky -- fix
                 for (uint i = 0; i < numWalls; ++i) {
-                    if (Physics::raycast(ray, walls[i], dist, yAxis)) {
-                        if (dPSq >= dist*dist) {
-                            if (yAxis) { ball.vel.x = -ball.vel.x; ball.dir.x = -ball.dir.x; }
-                            else { ball.vel.y = -ball.vel.y; ball.dir.y = -ball.dir.y; }
+                    if (Physics::CircleAndAABB(ball.hitbox, walls[i], n)) {                        
+                        if (std::fabs(n.x) > std::fabs(n.y)) {
+                            ball.vel.x = -ball.vel.x;
+                            ball.hitbox.c.x += ball.vel.x * dt; // apply the velocity a second time this iteration to ensure it escapes the wall.
+
+                        } else {
+                            ball.vel.y = -ball.vel.y;
+                            ball.hitbox.c.y += ball.vel.y * dt; // apply the velocity a second time this iteration to ensure it escapes the wall.
                         }
 
                         break;
                     }
                 }
 
-                // todo test values for this (both the slowing and the lenience for letting it go in)
-                if (Physics::raycast(ray, cup, dist, yAxis) && dPSq >= dist*dist) {
-                    if (ball.vel.magSq() <= 6.25) { complete = 1; return 0; }
-                    ball.vel *= 0.45;
+                if (canHit && Physics::CircleAndAABB(ball.hitbox, cup)) {
+                    if (ball.vel.magSq() <= 10000.0f) { complete = 1; return 0; }
+                    ball.vel *= 0.5f;
+                    canHit = 0;
                 }
 
-                ball.pos += dP;
+                ball.hitbox.c += ball.vel * dt;
                 ball.vel *= ball.linearDamping;
 
                 if (ball.vel.magSq() <= 100.0f) {
@@ -211,14 +208,14 @@ namespace TrickShot {
             void drawShootingUI(ZMath::Vec2D const &mousePos) const;
 
             // Draw the tiles associated with the stage.
-            void draw() const {
+            inline void draw() const {
                 for (uint i = 0; i < HEIGHT; ++i) {
                     for (uint j = 0; j < WIDTH; ++j) {
                         if (grid[i][j].exists) { DrawTexture(grid[i][j].texture, j*16 + offset.x, i*16 + offset.y, WHITE); }
                     }
                 }
 
-                DrawTexture(ball.texture, ball.pos.x, ball.pos.y, WHITE);
+                DrawTexture(ball.texture, ball.hitbox.c.x, ball.hitbox.c.y, WHITE);
             };
 
             // Unload the Textures

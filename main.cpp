@@ -66,6 +66,8 @@ int main() {
 
                 DrawFPS(10, 10);
 
+                if (trickShotStage.complete) { DrawText("Hello!!!", 150, 10, 30, WHITE); }
+
             EndDrawing();
 
             dt += GetFrameTime();

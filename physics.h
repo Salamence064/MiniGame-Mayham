@@ -133,6 +133,23 @@ namespace Physics {
         return closest.distSq(c.c) <= c.r*c.r;
     };
 
+    // Normal points away from A towards B.
+    // Normal will be a junk value if no collision occurs.
+    bool CircleAndAABB(const Circle &c, const AABB &a, ZMath::Vec2D &normal) {
+        // ? Determine the closest point of the AABB to the Circle and check if its distance to the center is less than the radius.
+
+        ZMath::Vec2D closest = c.c;
+        ZMath::Vec2D min = a.getMin(), max = a.getMax();
+
+        closest = ZMath::clamp(closest, min, max);
+        ZMath::Vec2D diff = closest - c.c;
+
+        if (diff.magSq() > c.r*c.r) { return 0; }
+
+        normal = diff.normalize();
+        return 1;
+    };
+
     bool CircleAndBox2D(const Circle &c, const Box2D &b) {
         // ? Same as CircleAndAABB except we first rotate the circle into the box's local space.
 
@@ -195,7 +212,7 @@ namespace Physics {
             return 0;
         }
 
-        yAxis = tMin == t3 || tMin == t4;
+        yAxis = tMin == t1 || tMin == t2;
 
         dist = tMin;
         return 1;
