@@ -99,7 +99,7 @@ namespace TrickShot {
                     for (uint j = 0; j < WIDTH; ++j) {
                         switch (line[j]) {
                             case 'w': {
-                                image = LoadImage("miniGames/resources/trickshot/ball.png");
+                                image = LoadImage("miniGames/resources/trickshot/wall.png");
                                 if (i && j && i != HEIGHT - 1 && j != WIDTH - 1) {
                                     float x = j*16.0f, y = i*16.0f;
                                     walls[temp++] = Physics::AABB(offset + ZMath::Vec2D(x, y), offset + ZMath::Vec2D(x + 16.0f, y + 16.0f));
@@ -212,6 +212,7 @@ namespace TrickShot {
                 for (uint i = 0; i < HEIGHT; ++i) {
                     for (uint j = 0; j < WIDTH; ++j) {
                         if (grid[i][j].exists) { DrawTexture(grid[i][j].texture, j*16 + offset.x, i*16 + offset.y, WHITE); }
+                        else { DrawRectangle(j*16.0f + offset.x, i*16.0f + offset.y, 16.0f, 16.0f, {0, 145, 50, 255}); }
                     }
                 }
 
