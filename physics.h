@@ -123,6 +123,24 @@ namespace Physics {
         return c1.c.distSq(c2.c) <= r*r;
     };
 
+    // used for checking if the ball is in the hole. Makes sure the circles are a certain portion inside each other
+    bool CircleInCircle(const Circle &c1, const Circle &c2) {
+        float r = 0.4f*(c1.r + c2.r);
+        return c1.c.distSq(c2.c) <= r*r;
+    };
+
+    // Normal points away from A towards B.
+    // Normal will be a junk value if no collision occurs.
+    bool CircleAndCircle(const Circle &c1, Circle const &c2, ZMath::Vec2D &normal) {
+        float r = c1.r + c2.r;
+        ZMath::Vec2D diff = c2.c - c1.c;
+
+        if (r*r < diff.magSq()) { return 0; }
+
+        normal = diff.normalize();
+        return 1;
+    };
+
     bool CircleAndAABB(const Circle &c, const AABB &a) {
         // ? Determine the closest point of the AABB to the Circle and check if its distance to the center is less than the radius.
 

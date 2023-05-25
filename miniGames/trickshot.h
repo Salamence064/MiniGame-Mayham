@@ -45,14 +45,14 @@ namespace TrickShot {
             Sprite grid[HEIGHT][WIDTH];
             
             Ball ball; // The ball the player shoots.
-            Physics::AABB cup; // AABB representing the cup. This should lay in one tile.
+            Physics::Circle hole; // AABB representing the hole. This should lay in one tile.
 
             Physics::AABB* walls; // List of walls the player can collide with.
             uint numWalls = 0; // number of walls
 
             ZMath::Vec2D offset; // offset to center the stage in the screen
 
-            bool canHit = 0; // used to determine if the ball can hit the cup
+            bool canHit = 0; // used to determine if the ball can hit the hole
 
         public:          
             Stage() {};
@@ -63,14 +63,16 @@ namespace TrickShot {
             
             Stage& operator = (Stage const &Stage) { throw std::runtime_error("TrickShot::Stage objcts CANNOT be assigned or reassigned with '='."); };
 
-            // todo add one more block type
+            // todo add one more block type -- probs a block that could slow down the ball
+            // todo maybe one that could speed it up again, too
+            // todo maybe a water hazard type block, too, that would force a restart
             /** 
              * Symbol Legend:
              * 
              * space = nothing
              * w = wall
              * b = ball
-             * c = cup
+             * h = hole
              * 
              * Each can be followed by an RGB to shade it a different color in the format [r],[b],[g]
              */
@@ -109,15 +111,14 @@ namespace TrickShot {
                             case 'b': {
                                 image = LoadImage("miniGames/resources/trickshot/ball.png");
                                 ImageResize(&image, 16, 16);
-                                ball = {LoadTextureFromImage(image), Physics::Circle(offset + ZMath::Vec2D(j*16.0f + 8.0f, i*16.0f + 8.0f), 8.0f), ZMath::Vec2D()};
+                                ball = {LoadTextureFromImage(image), Physics::Circle((offset + ZMath::Vec2D(j*16.0f + 8.0f, i*16.0f + 8.0f)), 8.0f), ZMath::Vec2D()};
                                 grid[i][j].exists = 0;
                                 continue;
                             }
 
-                            case 'c': {
-                                image = LoadImage("miniGames/resources/trickshot/cup.png");
-                                float x = j*16.0f, y = i*16.0f;
-                                cup = Physics::AABB(offset + ZMath::Vec2D(x, y), offset + ZMath::Vec2D(x + 16.0f, y + 16.0f));
+                            case 'h': {
+                                image = LoadImage("miniGames/resources/trickshot/hole.png");
+                                hole = Physics::Circle(offset + ZMath::Vec2D(j*16.0f + 8.0f, i*16.0f + 8.0f), 8.0f);
                                 break;
                             }
 
@@ -183,9 +184,9 @@ namespace TrickShot {
                     }
                 }
 
-                if (canHit && Physics::CircleAndAABB(ball.hitbox, cup)) {
+                if (canHit && Physics::CircleInCircle(ball.hitbox, hole)) {
                     if (ball.vel.magSq() <= 10000.0f) { complete = 1; return 0; }
-                    ball.vel *= 0.5f;
+                    ball.vel *= 0.45f;
                     canHit = 0;
                 }
 
@@ -215,7 +216,14 @@ namespace TrickShot {
                     }
                 }
 
-                DrawTexture(ball.texture, ball.hitbox.c.x, ball.hitbox.c.y, WHITE);
+                DrawTexture(ball.texture, ball.hitbox.c.x - 8.0f, ball.hitbox.c.y - 8.0f, WHITE);
+
+                // * =====================
+                // * Debug Drawings
+                // * =====================
+
+                // DrawCircle(ball.hitbox.c.x, ball.hitbox.c.y, ball.hitbox.r, RED);
+                // DrawCircle(hole.c.x, hole.c.y, hole.r, PINK);
             };
 
             // Unload the Textures
