@@ -42,12 +42,17 @@ namespace TrickShot {
             Physics::Circle hole; // Circle representing the hole. This should lay in one tile.
 
             Physics::AABB* tiles; // special tiles listed as AABBs.
-            uint numTiles = 0; // numver of tiles.
             uint numWalls = 0; // number of walls.
             uint numPanels = 0; // number of boost panels.
             uint numSand = 0; // number of sand tiles.
             uint numWater = 0; // number of water tiles.
 
+            // offsets
+            uint panelOffset;
+            uint sandOffset;
+            uint waterOffset;
+
+            ZMath::Vec2D startingPos; // starting position of the ball
             ZMath::Vec2D offset; // offset to center the stage in the screen
 
             bool canHit = 0; // used to determine if the ball can hit the hole
@@ -84,16 +89,28 @@ namespace TrickShot {
                 std::string line;
 
                 getline(f, line);
+                numWalls = std::stoi(line);
 
-                uint temp = 0; // temp value to use fewer additions
-                numTiles = std::stoi(line);
-                tiles = new Physics::AABB[numTiles];
+                getline(f, line);
+                numPanels = std::stoi(line);
 
-                tiles[temp++] = Physics::AABB(offset + ZMath::Vec2D(), offset + ZMath::Vec2D(WIDTH*16.0f, 0.0f));
-                tiles[temp++] = Physics::AABB(offset + ZMath::Vec2D(), offset + ZMath::Vec2D(0.0f, HEIGHT*16.0f));
-                tiles[temp++] = Physics::AABB(offset + ZMath::Vec2D(0.0f, HEIGHT*16.0f), offset + ZMath::Vec2D(WIDTH*16.0f, HEIGHT*16.0f));
-                tiles[temp++] = Physics::AABB(offset + ZMath::Vec2D(WIDTH*16.0f, 0.0f), offset + ZMath::Vec2D(WIDTH*16.0f, HEIGHT*16.0f));
-                numWalls = 4;
+                getline(f, line);
+                numSand = std::stoi(line);
+
+                getline(f, line);
+                numWater = std::stoi(line);
+                tiles = new Physics::AABB[numWalls + numPanels + numSand + numWater];
+
+                panelOffset = numWalls + numPanels;
+                sandOffset = numWalls + numPanels + numSand;
+                waterOffset = numWalls + numPanels + numSand + numWater;
+
+                uint temp1 = 0, temp2 = 0, temp3 = 0, temp4 = 0; // temp values for counting
+
+                tiles[temp1++] = Physics::AABB(offset + ZMath::Vec2D(), offset + ZMath::Vec2D(WIDTH*16.0f, 0.0f));
+                tiles[temp1++] = Physics::AABB(offset + ZMath::Vec2D(), offset + ZMath::Vec2D(0.0f, HEIGHT*16.0f));
+                tiles[temp1++] = Physics::AABB(offset + ZMath::Vec2D(0.0f, HEIGHT*16.0f), offset + ZMath::Vec2D(WIDTH*16.0f, HEIGHT*16.0f));
+                tiles[temp1++] = Physics::AABB(offset + ZMath::Vec2D(WIDTH*16.0f, 0.0f), offset + ZMath::Vec2D(WIDTH*16.0f, HEIGHT*16.0f));
 
                 for (uint i = 0; i < HEIGHT; ++i) {
                     getline(f, line);
@@ -110,8 +127,7 @@ namespace TrickShot {
 
                                 if (i && j && i != HEIGHT - 1 && j != WIDTH - 1) {
                                     float x = j*16.0f, y = i*16.0f;
-                                    tiles[temp++] = Physics::AABB(offset + ZMath::Vec2D(x, y), offset + ZMath::Vec2D(x + 16.0f, y + 16.0f));
-                                    numWalls++;
+                                    tiles[temp1++] = Physics::AABB(offset + ZMath::Vec2D(x, y), offset + ZMath::Vec2D(x + 16.0f, y + 16.0f));
                                 }
 
                                 ImageResize(&image, 16, 16);
@@ -128,19 +144,20 @@ namespace TrickShot {
 
                             case 'b': { // ball
                                 ball = {WHITE, Physics::Circle((offset + ZMath::Vec2D(j*16.0f + 8.0f, i*16.0f + 8.0f)), 8.0f), ZMath::Vec2D()};
+                                startingPos = ball.hitbox.c;
                                 grid[i][j].exists = 0;
                                 break;
                             }
 
                             case 'h': { // hole
                                 hole = Physics::Circle(offset + ZMath::Vec2D(j*16.0f + 8.0f, i*16.0f + 8.0f), 8.0f);
+                                grid[i][j].exists = 0;
                                 break;
                             }
 
                             case 'B': { // boost panel
                                 float x = j*16.0f, y = i*16.0f;
-                                tiles[temp++] = Physics::AABB(offset + ZMath::Vec2D(x, y), offset + ZMath::Vec2D(x + 16.0f, y + 16.0f));
-                                numPanels++;
+                                tiles[numWalls + temp2++] = Physics::AABB(offset + ZMath::Vec2D(x, y), offset + ZMath::Vec2D(x + 16.0f, y + 16.0f));
 
                                 image = LoadImage("miniGames/assets/trickshot/boostPanel.png");
                                 ImageResize(&image, 16, 16);
@@ -157,10 +174,9 @@ namespace TrickShot {
 
                             case 's': { // sand
                                 float x = j*16.0f, y = i*16.0f;
-                                tiles[temp++] = Physics::AABB(offset + ZMath::Vec2D(x, y), offset + ZMath::Vec2D(x + 16.0f, y + 16.0f));
-                                numSand++;
+                                tiles[numWalls + numPanels + temp3++] = Physics::AABB(offset + ZMath::Vec2D(x, y), offset + ZMath::Vec2D(x + 16.0f, y + 16.0f));
 
-                                image = LoadImage("miniGames/assets/trickshot/boostPanel.png");
+                                image = LoadImage("miniGames/assets/trickshot/sand.png");
                                 ImageResize(&image, 16, 16);
 
                                 // Add the information for the sprite
@@ -175,10 +191,9 @@ namespace TrickShot {
 
                             case 'W': { // water
                                 float x = j*16.0f, y = i*16.0f;
-                                tiles[temp++] = Physics::AABB(offset + ZMath::Vec2D(x, y), offset + ZMath::Vec2D(x + 16.0f, y + 16.0f));
-                                numWater++;
+                                tiles[numWalls + numPanels + numSand + temp4++] = Physics::AABB(offset + ZMath::Vec2D(x, y), offset + ZMath::Vec2D(x + 16.0f, y + 16.0f));
 
-                                image = LoadImage("miniGames/assets/trickshot/boostPanel.png");
+                                image = LoadImage("miniGames/assets/trickshot/water.png");
                                 ImageResize(&image, 16, 16);
 
                                 // Add the information for the sprite
@@ -221,6 +236,7 @@ namespace TrickShot {
             bool update(float dt) {
                 ZMath::Vec2D n;
 
+                // wall collisions
                 for (uint i = 0; i < numWalls; ++i) {
                     if (Physics::CircleAndAABB(ball.hitbox, tiles[i], n)) {                        
                         if (std::fabs(n.x) > std::fabs(n.y)) {
@@ -236,10 +252,24 @@ namespace TrickShot {
                     }
                 }
 
-                // todo for now this will be okay to test. This will not work long term. Must ensure each wall is placed together and at the start of the list
-                for (uint i = numWalls; i < numWalls + numPanels; ++i) {
+                // todo make offset variables
+
+                // boost panels
+                for (uint i = numWalls; i < panelOffset; ++i) {
+                    if (Physics::CircleAndAABB(ball.hitbox, tiles[i])) { ball.vel *= 1.1f; }
+                }
+
+                // sand
+                for (uint i = panelOffset; i < sandOffset; ++i) {
+                    if (Physics::CircleAndAABB(ball.hitbox, tiles[i])) { ball.vel *= 0.965f; }
+                }
+
+                // water
+                for (uint i = sandOffset; i < waterOffset; ++i) {
                     if (Physics::CircleAndAABB(ball.hitbox, tiles[i])) {
-                        ball.vel *= 1.1f;
+                        ball.hitbox.c = startingPos;
+                        ball.vel.zero();
+                        return 1;
                     }
                 }
 
