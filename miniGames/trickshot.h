@@ -1,8 +1,8 @@
 #ifndef TRICKSHOT_H
 #define TRICKSHOT_H
 
-#include <iostream> // !debugging
 #include <fstream>
+#include <sstream>
 #include "../utility.h"
 #include "../physics.h"
 
@@ -10,18 +10,12 @@
 // * Trick Shot Backend
 // * =======================
 
-// todo handle graphics after adding the graphics library
-
 namespace TrickShot {
-    // todo setup a radius for the ball
-    // todo factor in the ball's radius into the calculations for reversing its velocity (for both x and y vels)
-
     struct Ball {
-        Texture2D texture; // texture for the ball's sprite
+        Color color; // color of the golf ball.
         Physics::Circle hitbox; // Circle representing the ball.
         ZMath::Vec2D vel; // ball's velocity in terms of pixels
         float linearDamping = 0.98f; // friction applied to the ball
-        // todo test for an ideal linearDamping value
     };
 
     class Stage {
@@ -41,11 +35,10 @@ namespace TrickShot {
             bool complete = 0; // has the stage been completed
 
         private:
-            // todo also do not store the ball's pos in the grid and draw it separately
             Sprite grid[HEIGHT][WIDTH];
             
             Ball ball; // The ball the player shoots.
-            Physics::Circle hole; // AABB representing the hole. This should lay in one tile.
+            Physics::Circle hole; // Circle representing the hole. This should lay in one tile.
 
             Physics::AABB* walls; // List of walls the player can collide with.
             uint numWalls = 0; // number of walls
@@ -98,12 +91,23 @@ namespace TrickShot {
 
                     for (uint j = 0; j < WIDTH; ++j) {
                         switch (line[j]) {
-                            case 'w': {
+                            case 'w': { // todo use shortcuts for rendering the wall sprites so it isn't as taxing
                                 image = LoadImage("miniGames/resources/trickshot/wall.png");
                                 if (i && j && i != HEIGHT - 1 && j != WIDTH - 1) {
                                     float x = j*16.0f, y = i*16.0f;
                                     walls[temp++] = Physics::AABB(offset + ZMath::Vec2D(x, y), offset + ZMath::Vec2D(x + 16.0f, y + 16.0f));
                                 }
+
+                                ImageResize(&image, 16, 16);
+
+                                // Add the information for the sprite
+                                // Note we do not need to set x, y as the matrix tells us the positions for us (since we have uniform tiles)
+                                grid[i][j].exists = 1;
+                                grid[i][j].texture = LoadTextureFromImage(image);
+                                grid[i][j].width = 16;
+                                grid[i][j].height = 16;
+
+                                UnloadImage(image);
 
                                 break;
                             }
@@ -111,33 +115,21 @@ namespace TrickShot {
                             case 'b': {
                                 image = LoadImage("miniGames/resources/trickshot/ball.png");
                                 ImageResize(&image, 16, 16);
-                                ball = {LoadTextureFromImage(image), Physics::Circle((offset + ZMath::Vec2D(j*16.0f + 8.0f, i*16.0f + 8.0f)), 8.0f), ZMath::Vec2D()};
+                                ball = {WHITE, Physics::Circle((offset + ZMath::Vec2D(j*16.0f + 8.0f, i*16.0f + 8.0f)), 8.0f), ZMath::Vec2D()};
                                 grid[i][j].exists = 0;
-                                continue;
+                                break;
                             }
 
                             case 'h': {
-                                image = LoadImage("miniGames/resources/trickshot/hole.png");
                                 hole = Physics::Circle(offset + ZMath::Vec2D(j*16.0f + 8.0f, i*16.0f + 8.0f), 8.0f);
                                 break;
                             }
 
                             default: {
                                 grid[i][j].exists = 0;
-                                continue;
+                                break;
                             }
                         }
-
-                        ImageResize(&image, 16, 16);
-
-                        // Add the information for the sprite
-                        // Note we do not need to set x, y as the matrix tells us the positions for us (since we have uniform tiles)
-                        grid[i][j].exists = 1;
-                        grid[i][j].texture = LoadTextureFromImage(image);
-                        grid[i][j].width = 16;
-                        grid[i][j].height = 16;
-
-                        UnloadImage(image);
 
                         // todo add in the RGB part of the parser (this will be done in terms of tint)
                     }
@@ -209,6 +201,7 @@ namespace TrickShot {
 
             // Draw the tiles associated with the stage.
             inline void draw() const {
+                // todo draw a surrounding outer barrier of walls
                 for (uint i = 0; i < HEIGHT; ++i) {
                     for (uint j = 0; j < WIDTH; ++j) {
                         if (grid[i][j].exists) { DrawTexture(grid[i][j].texture, j*16 + offset.x, i*16 + offset.y, WHITE); }
@@ -216,14 +209,17 @@ namespace TrickShot {
                     }
                 }
 
-                DrawTexture(ball.texture, ball.hitbox.c.x - 8.0f, ball.hitbox.c.y - 8.0f, WHITE);
+                DrawCircle(hole.c.x, hole.c.y, hole.r, BLACK);
+                DrawCircle(ball.hitbox.c.x, ball.hitbox.c.y, ball.hitbox.r, ball.color);
 
-                // * =====================
-                // * Debug Drawings
-                // * =====================
+                // * Debug stuff
+                // std::ostringstream sout;
+                // sout << "Ball.c: " << ball.hitbox.c.x << ", " << ball.hitbox.c.y << "\nBall.r: " << ball.hitbox.r;
+                // DrawText(sout.str().c_str(), 10, 50, 30, WHITE);
 
-                // DrawCircle(ball.hitbox.c.x, ball.hitbox.c.y, ball.hitbox.r, RED);
-                // DrawCircle(hole.c.x, hole.c.y, hole.r, PINK);
+                // std::ostringstream sout1;
+                // sout1 << "Hole.c: " << hole.c.x << ", " << hole.c.y << "\nHole.r: " << hole.r;
+                // DrawText(sout1.str().c_str(), 1400, 10, 30, WHITE);
             };
 
             // Unload the Textures
@@ -234,8 +230,6 @@ namespace TrickShot {
                         if (grid[i][j].exists) { UnloadTexture(grid[i][j].texture); }
                     }
                 }
-
-                UnloadTexture(ball.texture);
             };
     };
 }

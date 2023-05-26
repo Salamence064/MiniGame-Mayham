@@ -125,7 +125,7 @@ namespace Physics {
 
     // used for checking if the ball is in the hole. Makes sure the circles are a certain portion inside each other
     bool CircleInCircle(const Circle &c1, const Circle &c2) {
-        float r = 0.4f*(c1.r + c2.r);
+        float r = 0.6f*(c1.r + c2.r);
         return c1.c.distSq(c2.c) <= r*r;
     };
 
