@@ -11,8 +11,6 @@ struct Sprite {
     bool exists;
 
     Texture2D texture;
-    uint x;
-    uint y;
     uint width;
     uint height;
 };
