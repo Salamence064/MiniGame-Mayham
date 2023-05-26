@@ -107,10 +107,10 @@ namespace TrickShot {
 
                 uint temp1 = 0, temp2 = 0, temp3 = 0, temp4 = 0; // temp values for counting
 
-                tiles[temp1++] = Physics::AABB(offset + ZMath::Vec2D(), offset + ZMath::Vec2D(WIDTH*16.0f, 0.0f));
-                tiles[temp1++] = Physics::AABB(offset + ZMath::Vec2D(), offset + ZMath::Vec2D(0.0f, HEIGHT*16.0f));
-                tiles[temp1++] = Physics::AABB(offset + ZMath::Vec2D(0.0f, HEIGHT*16.0f), offset + ZMath::Vec2D(WIDTH*16.0f, HEIGHT*16.0f));
-                tiles[temp1++] = Physics::AABB(offset + ZMath::Vec2D(WIDTH*16.0f, 0.0f), offset + ZMath::Vec2D(WIDTH*16.0f, HEIGHT*16.0f));
+                tiles[temp1++] = Physics::AABB(offset + ZMath::Vec2D(), offset + ZMath::Vec2D(WIDTH*16.0f, 16.0f));
+                tiles[temp1++] = Physics::AABB(offset + ZMath::Vec2D(), offset + ZMath::Vec2D(16.0f, HEIGHT*16.0f));
+                tiles[temp1++] = Physics::AABB(offset + ZMath::Vec2D(0.0f, HEIGHT*16.0f - 16.0f), offset + ZMath::Vec2D(WIDTH*16.0f, HEIGHT*16.0f));
+                tiles[temp1++] = Physics::AABB(offset + ZMath::Vec2D(WIDTH*16.0f - 16.0f, 0.0f), offset + ZMath::Vec2D(WIDTH*16.0f, HEIGHT*16.0f));
 
                 for (uint i = 0; i < HEIGHT; ++i) {
                     getline(f, line);
@@ -295,7 +295,7 @@ namespace TrickShot {
              * 
              * @param mousePos The relative position of the mouse in terms of pixels.
              */
-            // todo add
+            // todo make this func
             void drawShootingUI(ZMath::Vec2D const &mousePos) const;
 
             // Draw the tiles associated with the stage.
