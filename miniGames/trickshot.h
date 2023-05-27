@@ -34,6 +34,7 @@ namespace TrickShot {
         // (0, n), (1, n), (2, n), ..., (n, n)
 
         public:
+            // todo maybe store in terms of pixels
             // width = numCols
             // height = numRows
             uint width = 50; // width of the board
@@ -120,13 +121,15 @@ namespace TrickShot {
                 Image image1 = LoadImage("miniGames/assets/trickshot/border1.png");
                 Image image2 = LoadImage("miniGames/assets/trickshot/border2.png");
 
-                ImageResize(&image1, 16, 800);
-                ImageResize(&image2, 768, 16);
+                uint w = 16*width, h = 16*height;
 
-                tiles[temp1++] = {LoadTextureFromImage(image1), Physics::AABB(offset + ZMath::Vec2D(), offset + ZMath::Vec2D(16, 800))};
-                tiles[temp1++] = {LoadTextureFromImage(image2), Physics::AABB(offset + ZMath::Vec2D(16, 0), offset + ZMath::Vec2D(800, 16))};
-                tiles[temp1++] = {LoadTextureFromImage(image1), Physics::AABB(offset + ZMath::Vec2D(784, 0), offset + ZMath::Vec2D(800, 800))};
-                tiles[temp1++] = {LoadTextureFromImage(image2), Physics::AABB(offset + ZMath::Vec2D(16, 784), offset + ZMath::Vec2D(800, 800))};
+                ImageResize(&image1, 16, h);
+                ImageResize(&image2, w - 32, 16);
+
+                tiles[temp1++] = {LoadTextureFromImage(image1), Physics::AABB(offset + ZMath::Vec2D(), offset + ZMath::Vec2D(16, h))};
+                tiles[temp1++] = {LoadTextureFromImage(image2), Physics::AABB(offset + ZMath::Vec2D(16, 0), offset + ZMath::Vec2D(h, 16))};
+                tiles[temp1++] = {LoadTextureFromImage(image1), Physics::AABB(offset + ZMath::Vec2D(w - 16, 0), offset + ZMath::Vec2D(w, h))};
+                tiles[temp1++] = {LoadTextureFromImage(image2), Physics::AABB(offset + ZMath::Vec2D(16, h - 16), offset + ZMath::Vec2D(w - 16, h))};
 
                 UnloadImage(image1);
                 UnloadImage(image2);
@@ -147,7 +150,7 @@ namespace TrickShot {
                                      LoadTextureFromImage(image),
                                      Physics::AABB(offset + ZMath::Vec2D(x, y), offset + ZMath::Vec2D(x + 16.0f, y + 16.0f))
                                 };
-                                
+
                                 UnloadImage(image);
                                 break;
                             }
@@ -228,6 +231,7 @@ namespace TrickShot {
             bool update(float dt) {
                 ZMath::Vec2D n;
 
+                // todo collision with top wall is bugged
                 // wall collisions
                 for (uint i = 0; i < numWalls; ++i) {
                     if (Physics::CircleAndAABB(ball.hitbox, tiles[i].collider, n)) {                        
@@ -246,7 +250,9 @@ namespace TrickShot {
 
                 // boost panels
                 for (uint i = numWalls; i < panelOffset; ++i) {
-                    if (Physics::CircleAndAABB(ball.hitbox, tiles[i].collider)) { ball.vel *= 1.1f; }
+                    if (Physics::CircleAndAABB(ball.hitbox, tiles[i].collider)) {
+                        if (ball.vel.magSq() < 1000000.0f) { ball.vel *= 1.1f; }
+                    }
                 }
 
                 // sand
@@ -296,11 +302,6 @@ namespace TrickShot {
                 for (uint i = 0; i < waterOffset; ++i) {
                     v = tiles[i].collider.getMin();
                     DrawTexture(tiles[i].text, v.x, v.y, WHITE);
-
-                    // std::ostringstream sout;
-                    // sout << v.x << ", " << v.y;
-
-                    // DrawText(sout.str().c_str(), v.x, v.y, 16, WHITE);
                 }
 
                 DrawCircle(hole.c.x, hole.c.y, hole.r, BLACK);
