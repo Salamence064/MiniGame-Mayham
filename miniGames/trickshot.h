@@ -100,7 +100,7 @@ namespace TrickShot {
                 UnloadImage(image4);
 
                 // Set up the rest of the stage
-                std::ifstream f("miniGames/assets/trickshot/maps/map3.map");
+                std::ifstream f("miniGames/assets/trickshot/maps/map4.map");
                 std::string line;
 
                 getline(f, line);
