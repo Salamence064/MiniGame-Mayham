@@ -61,6 +61,7 @@ namespace TrickShot {
             ZMath::Vec2D startingPos; // starting position of the ball
             ZMath::Vec2D offset; // offset to center the stage in the screen
 
+            uint strokes = 1; // number of strokes the player has taken
             bool canHit = 0; // used to determine if the ball can hit the hole
 
         public:          
@@ -168,6 +169,7 @@ namespace TrickShot {
              */
             inline void shoot(const ZMath::Vec2D &dm) {
                 ball.vel.set(dm);
+                strokes++;
                 canHit = 1;
             };
 
@@ -185,11 +187,11 @@ namespace TrickShot {
                     if (Physics::CircleAndAABB(ball.hitbox, tiles[i], n)) {                        
                         if (std::fabs(n.x) > std::fabs(n.y)) {
                             ball.vel.x = -ball.vel.x;
-                            // ball.hitbox.c.x += ball.vel.x * dt; // apply the velocity a second time this iteration to ensure it escapes the wall.
+                            ball.hitbox.c.x += ball.vel.x * dt; // apply the velocity a second time this iteration to ensure it escapes the wall.
 
                         } else {
                             ball.vel.y = -ball.vel.y;
-                            // ball.hitbox.c.y += ball.vel.y * dt; // apply the velocity a second time this iteration to ensure it escapes the wall.
+                            ball.hitbox.c.y += ball.vel.y * dt; // apply the velocity a second time this iteration to ensure it escapes the wall.
                         }
 
                         break;
@@ -200,14 +202,12 @@ namespace TrickShot {
                 for (uint i = numWalls; i < panelOffset; ++i) {
                     if (Physics::CircleAndAABB(ball.hitbox, tiles[i])) {
                         if (ball.vel.magSq() < 1000000.0f) { ball.vel *= 1.1f; }
-                        break;
                     }
                 }
 
                 // sand
                 for (uint i = panelOffset; i < sandOffset; ++i) {
                     if (Physics::CircleAndAABB(ball.hitbox, tiles[i])) { ball.vel *= 0.965f; }
-                    break;
                 }
 
                 // water
@@ -253,6 +253,19 @@ namespace TrickShot {
 
                 DrawCircle(hole.c.x, hole.c.y, hole.r, BLACK);
                 DrawCircle(ball.hitbox.c.x, ball.hitbox.c.y, ball.hitbox.r, ball.color);
+
+                if (complete) {
+                    std::ostringstream sout;
+                    sout << "You made it in " << (strokes - 1) << " strokes!";
+                    int textWidth = MeasureText(sout.str().c_str(), 50);
+
+                    DrawText(sout.str().c_str(), (1900 - textWidth)/2, 425, 50, WHITE);
+
+                } else {
+                    std::ostringstream sout;
+                    sout << "Stroke: " << strokes;
+                    DrawText(sout.str().c_str(), 10, 10, 30, WHITE);
+                }
             };
 
             ~Stage() {

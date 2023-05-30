@@ -64,9 +64,9 @@ int main() {
 
                 trickShotStage.draw();
 
-                DrawFPS(10, 10);
+                DrawFPS(10, 50);
 
-                if (trickShotStage.complete) { DrawText("Hello!!!", 150, 10, 30, WHITE); }
+                // if (trickShotStage.complete) { DrawText("Hello!!!", 200, 10, 30, WHITE); }
 
             EndDrawing();
 
