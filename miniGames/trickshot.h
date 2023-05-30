@@ -98,7 +98,7 @@ namespace TrickShot {
                 UnloadImage(image4);
 
                 // Set up the rest of the stage
-                std::ifstream f("miniGames/assets/trickshot/maps/map1.map");
+                std::ifstream f("miniGames/assets/trickshot/maps/map2.map");
                 std::string line;
 
                 getline(f, line);
@@ -183,6 +183,8 @@ namespace TrickShot {
                 ZMath::Vec2D n;
 
                 // wall collisions
+                // todo corner collisions can be buggy as it will reverse the ball's vel in the y, pushing it into the wall instead of away in certain cases
+                // todo fix
                 for (uint i = 0; i < numWalls; ++i) {
                     if (Physics::CircleAndAABB(ball.hitbox, tiles[i], n)) {                        
                         if (std::fabs(n.x) > std::fabs(n.y)) {
@@ -193,8 +195,6 @@ namespace TrickShot {
                             ball.vel.y = -ball.vel.y;
                             ball.hitbox.c.y += ball.vel.y * dt; // apply the velocity a second time this iteration to ensure it escapes the wall.
                         }
-
-                        break;
                     }
                 }
 
@@ -259,7 +259,7 @@ namespace TrickShot {
                     sout << "You made it in " << (strokes - 1) << " strokes!";
                     int textWidth = MeasureText(sout.str().c_str(), 50);
 
-                    DrawText(sout.str().c_str(), (1900 - textWidth)/2, 425, 50, WHITE);
+                    DrawText(sout.str().c_str(), offset.x + (16*width - textWidth)/2, 425, 50, WHITE);
 
                 } else {
                     std::ostringstream sout;
