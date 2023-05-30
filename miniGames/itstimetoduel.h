@@ -1,8 +1,10 @@
 #ifndef ITS_TIME_TO_DUEL_H
 #define ITS_TIME_TO_DUEL_H
 
-#include "../utility.h"
+#include "raylib.h"
 #include "../physics.h"
+
+typedef unsigned int uint;
 
 // todo update to model the players' hitboxes with ellipses
 
@@ -23,7 +25,7 @@ namespace Duel {
 
             Physics::Circle hitbox; // Circle representing the hitbox of the player.
 
-            std::string filepath; // Filepath for the sprite of the player.
+            //std::string filepath; // Filepath for the sprite of the player.
             int hp; // todo test for good hp values
         
             Player(const ZMath::Vec2D &pos);
@@ -52,7 +54,7 @@ namespace Duel {
             static const uint HEIGHT = 50; // height of the board
 
         private:
-            Sprite grid[HEIGHT][WIDTH];
+            //Sprite grid[HEIGHT][WIDTH];
             Player player1;
             Player player2;
             

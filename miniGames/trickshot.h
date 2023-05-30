@@ -3,8 +3,10 @@
 
 #include <fstream>
 #include <sstream>
-#include "../utility.h"
+#include "raylib.h"
 #include "../physics.h"
+
+typedef unsigned int uint;
 
 // * =======================
 // * Trick Shot Backend
