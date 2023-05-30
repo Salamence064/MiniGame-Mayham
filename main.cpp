@@ -19,7 +19,7 @@ int main() {
 
     InitWindow(screenWidth, screenHeight, "Mini-Game Mayham");
 
-    trickShotStage.init(ZMath::Vec2D(500.0f, 50.0f));
+    trickShotStage.init();
 
     #if defined(PLATFORM_WEB)
         emscripten_set_main_loop(UpdateDrawFrame, 60, 1);

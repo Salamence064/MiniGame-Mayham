@@ -1,22 +1,46 @@
-35
+70
 16
-24
-10
-48
-28
-zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz
-z       w                     WWWWz
-z       w                      WWWz
-z  b    w                       WWz
-z       w                  BB    Wz
-z       w                  BB     z
-z       w            ww         ssz
-z       w       w    ww       ssssz
-z       w       w             ssssz
-z               w        sssssss  z
-z               w       ssssss    z
-z      BBB      w      ssWWWWs  h z
-zW     BBB      w      ssWWWWss   z
-zWW             w     sssWWWWss   z
-zWWW            w   sssssssssssss z
-zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz
+7
+2
+7
+8
+wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww
+w       ww                                                       WWWWw
+w       ww                                                        WWWw
+w  b    ww                                                         WWw
+w       ww                                                          Ww
+w       ww                                                           w
+w       ww                 BBB                                     ssw
+w       ww       ww        BBB                                   ssssw
+w       ww       ww                                            ssssssw
+w                ww                      ww                ssssssss  w
+w                ww                      ww                ssssss    w
+w      BBBB      ww                                       ssWWWWss h w
+wW     BBBB      ww                                       ssWWWWss   w
+wWW              ww                                     ssssWWWWss   w
+wWWW             ww                                     ssssWWWWss   w
+wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww
+0,0|16,256
+16,0|1104,16
+16,240|1104,256
+1104,0|1120,256
+128,16|160,144
+272,112|304,240
+656,144|688,176
+112,176|176,208
+448,96|496,128
+1072,96|1104,144
+1040,112|1072,160
+1008,128|1040,176
+944,144|1008,176
+928,176|960,240
+896,208|928,240
+1024,176|1056,240
+16,192|32,240
+32,208|48,240
+48,224|64,240
+1040,16|1056,32
+1056,16|1072,48
+1072,16|1088,64
+1088,16|1104,80
+960,176|1024,240

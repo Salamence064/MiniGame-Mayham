@@ -1,0 +1,23 @@
+Documentation for trickshot .map files.
+Note: if any of this is not followed, undefined behvior will occur when parsing your map.
+
+1st line = width
+2nd line = height
+3rd line = number of wall colliders
+4th line = number of boost panel colliders
+5th line = number of sand colliders
+6th line = number of water colliders
+
+Place tiles in a width by height grid according to the following legend:
+    w = wall
+    b = ball
+    h = hole
+    B = boost panel
+    s = sand
+    W = water
+    anything else = nothing
+
+The remaining lines should be the starting and ending points of your colliders.
+They should be formatted: x1,y1|x2,y2 (e.g. 16,32|32,48)
+The wall colliders should be placed first, then the boost panel colliders, then the sand colliders, then, finally, the water colliders.
+If they are placed out of order or you say there will be more colliders than you specify, undefined behvior will occur.
