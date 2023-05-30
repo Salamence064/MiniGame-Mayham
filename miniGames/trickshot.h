@@ -100,7 +100,7 @@ namespace TrickShot {
                 UnloadImage(image4);
 
                 // Set up the rest of the stage
-                std::ifstream f("miniGames/assets/trickshot/maps/map1.map");
+                std::ifstream f("miniGames/assets/trickshot/maps/map3.map");
                 std::string line;
 
                 getline(f, line);
@@ -186,7 +186,8 @@ namespace TrickShot {
 
                 // wall collisions
                 // todo corner collisions can be buggy as it will reverse the ball's vel in the y, pushing it into the wall instead of away in certain cases
-                // todo fix
+                // todo collision error causes when going too fast -- likely cause the normal isn't as expected when this happens due to the ball penetrating too far into the wall
+                // ! If the ball moves too fast it can phase through the wall.
                 for (uint i = 0; i < numWalls; ++i) {
                     if (Physics::CircleAndAABB(ball.hitbox, tiles[i], n)) {                        
                         if (std::fabs(n.x) > std::fabs(n.y)) {

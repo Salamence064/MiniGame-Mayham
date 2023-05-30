@@ -5,28 +5,42 @@
 2
 3
 wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww
-w                                      w
-w                                      w
-w                                      w
-w                                      w
-w                                      w
-w                                      w
-w                                      w
-w                                      w
-w                                      w
-w                                      w
-w                                      w
-w                                      w
-w                                      w
-w                                      w
-w                                      w
-w                                      w
-w                                      w
-w                                      w
-w                                      w
-w                                      w
-w                                      w
-w                                      w
-w                                      w
-w                                      w
+w           ssssssssss             WWWWw
+w           ssssssssss             WWWWw
+w           ssssssssss             WWWWw
+w           ssssssssss                 w
+w           ssssssssss                 w
+w           ssssssssss                 w
+w      wwwwwwwwwwwwwwwwwwww            w
+w      wwwwwwwwwwwwwwwwwwww            w
+w      ww      ssss                    w
+w     Www                              w
+w     Www                              w
+w h   Www                BB            w
+w     Www                BB            w
+w     Www                              w
+w     Www b                            w
+w      ww                              w
+w      wwwwwwwwwwwwwwwwwwww            w
+w      wwwwwwwwwwwwwwwwwwww            w
+w           BBBBBBBBBB                 w
+w           BBBBBBBBBB                 w
+w           BBBBBBBBBB                 w
+w           BBBBBBBBBB             WWWWw
+w           BBBBBBBBBB             WWWWw
+w           BBBBBBBBBB             WWWWw
 wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww
+0,0|16,416
+626,0|640,416
+16,0|626,16
+16,400|626,416
+112,112|432,144
+112,144|144,272
+112,272|432,304
+400,192|432,224
+192,304|352,400
+192,16|352,112
+240,144|304,160
+96,160|112,256
+560,16|626,64
+560,352|626,400
