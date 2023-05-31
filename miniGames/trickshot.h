@@ -20,7 +20,7 @@ namespace TrickShot {
         float linearDamping = 0.98f; // friction applied to the ball.
     };
 
-    class Stage {
+    class Stage { // todo stage 4 feels like the weakest stage out of them all. Line up the walls better for bank shots I think
         // * Tile Coordinate System
         // (0, 0), (1, 0), (2, 0), ..., (n, 0)
         // (0, 1), (1, 1), (2, 1), ..., (n, 1)
@@ -66,7 +66,7 @@ namespace TrickShot {
             uint strokes = 1; // number of strokes the player has taken
             bool canHit = 0; // used to determine if the ball can hit the hole
 
-        public:          
+        public:
             Stage() {};
 
             // * Do not allow for the creation of the Stage objects through copy constructors or copy assignment operators.
@@ -100,7 +100,7 @@ namespace TrickShot {
                 UnloadImage(image4);
 
                 // Set up the rest of the stage
-                std::ifstream f("miniGames/assets/trickshot/maps/map4.map");
+                std::ifstream f("miniGames/assets/trickshot/maps/map5.map");
                 std::string line;
 
                 getline(f, line);
@@ -257,7 +257,7 @@ namespace TrickShot {
                 DrawCircle(hole.c.x, hole.c.y, hole.r, BLACK);
                 DrawCircle(ball.hitbox.c.x, ball.hitbox.c.y, ball.hitbox.r, ball.color);
 
-                if (complete) {
+                if (complete) { // todo not displaying the stroke count for map 5
                     std::ostringstream sout;
                     sout << "You made it in " << (strokes - 1) << " strokes!";
                     int textWidth = MeasureText(sout.str().c_str(), 50);
