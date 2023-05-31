@@ -259,7 +259,8 @@ namespace TrickShot {
 
                 if (complete) { // todo does not display for map 5
                     std::ostringstream sout;
-                    sout << "You made it in " << (strokes - 1) << " strokes!";
+                    if (strokes == 2) { sout << "Hole in One!"; }
+                    else { sout << "You made it in " << (strokes - 1) << " strokes!"; }
                     int textWidth = MeasureText(sout.str().c_str(), 50);
 
                     DrawText(sout.str().c_str(), (1800 - textWidth)/2, 425, 50, WHITE);
