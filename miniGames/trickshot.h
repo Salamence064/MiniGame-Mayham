@@ -100,7 +100,7 @@ namespace TrickShot {
                 UnloadImage(image4);
 
                 // Set up the rest of the stage
-                std::ifstream f("miniGames/assets/trickshot/maps/map5.map");
+                std::ifstream f("miniGames/assets/trickshot/maps/ma1.map");
                 std::string line;
 
                 getline(f, line);
@@ -257,12 +257,12 @@ namespace TrickShot {
                 DrawCircle(hole.c.x, hole.c.y, hole.r, BLACK);
                 DrawCircle(ball.hitbox.c.x, ball.hitbox.c.y, ball.hitbox.r, ball.color);
 
-                if (complete) { // todo not displaying the stroke count for map 5
+                if (complete) { // todo does not display for map 5
                     std::ostringstream sout;
                     sout << "You made it in " << (strokes - 1) << " strokes!";
                     int textWidth = MeasureText(sout.str().c_str(), 50);
 
-                    DrawText(sout.str().c_str(), offset.x + (16*width - textWidth)/2, 425, 50, WHITE);
+                    DrawText(sout.str().c_str(), (1800 - textWidth)/2, 425, 50, WHITE);
 
                 } else {
                     std::ostringstream sout;
