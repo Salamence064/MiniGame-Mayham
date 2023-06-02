@@ -22,6 +22,22 @@ namespace Physics {
             Ray2D(const ZMath::Vec2D &origin, const ZMath::Vec2D &dir) : origin(origin), dir(dir) {};
     };
 
+    class Line2D {
+        public:
+            ZMath::Vec2D start, end;
+
+            /**
+             * @brief Create a 2D line between two points.
+             * 
+             * @param start Starting point.
+             * @param end Ending point.
+             */
+            Line2D(ZMath::Vec2D const &start, ZMath::Vec2D const &end) : start(start), end(end) {};
+
+            inline ZMath::Vec2D getMin() const { return ZMath::Vec2D(ZMath::min(start.x, end.x), ZMath::min(start.y, end.y)); };
+            inline ZMath::Vec2D getMax() const { return ZMath::Vec2D(ZMath::max(start.x, end.x), ZMath::max(start.y, end.y)); };
+    };
+
     class Circle {
         public:
             ZMath::Vec2D c; // center
@@ -117,6 +133,19 @@ namespace Physics {
     // * ===========================
     // * Intersection Detection
     // * ===========================
+
+    // Note: yAxis will return a junk value if there is no collision
+    bool LineAndAABB(Line2D const &l, AABB const &a, bool yAxis) {
+        ZMath::Vec2D minL = l.getMin(), maxL = l.getMax();
+        ZMath::Vec2D minA = a.getMin(), maxA = a.getMax();
+
+        if (minL.x <= maxA.x && minA.x <= maxL.x && minL.y <= maxA.y && minA.y <= maxL.y) {
+            yAxis = minL.x <= minA.x && maxA.x <= maxL.x;
+            return 1;
+        }
+
+        return 0;
+    };
 
     bool CircleAndCircle(const Circle &c1, const Circle &c2) {
         float r = c1.r + c2.r;

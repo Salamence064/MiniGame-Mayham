@@ -17,6 +17,7 @@ namespace TrickShot {
         Color color; // color of the golf ball.
         Physics::Circle hitbox; // Circle representing the ball.
         ZMath::Vec2D vel; // ball's velocity in terms of pixels.
+        ZMath::Vec2D prevPos; // ball's previous position.
         float linearDamping = 0.98f; // friction applied to the ball.
     };
 
@@ -100,7 +101,7 @@ namespace TrickShot {
                 UnloadImage(image4);
 
                 // Set up the rest of the stage
-                std::ifstream f("miniGames/assets/trickshot/maps/map1.map");
+                std::ifstream f("miniGames/assets/trickshot/maps/map3.map");
                 std::string line;
 
                 getline(f, line);
@@ -135,7 +136,7 @@ namespace TrickShot {
                     getline(f, line);
                     for (uint j = 0; j < width; ++j) {
                         if (line[j] == 'b') {
-                            ball = {WHITE, Physics::Circle(offset + ZMath::Vec2D(j*16 + 8.0f, i*16 + 8.0f), 8.0f), ZMath::Vec2D()};
+                            ball = {WHITE, Physics::Circle(offset + ZMath::Vec2D(j*16 + 8.0f, i*16 + 8.0f), 8.0f), ZMath::Vec2D(), ball.hitbox.c};
                             startingPos = ball.hitbox.c;
                             continue;
                         }
@@ -183,21 +184,44 @@ namespace TrickShot {
              */
             bool update(float dt) {
                 ZMath::Vec2D n;
+                Physics::Line2D dP(ball.prevPos, ball.hitbox.c);
 
                 // wall collisions
-                // todo corner collisions can be buggy as it will reverse the ball's vel in the y, pushing it into the wall instead of away in certain cases
-                // todo collision error causes when going too fast -- likely cause the normal isn't as expected when this happens due to the ball penetrating too far into the wall
-                // ! If the ball moves too fast it can phase through the wall.
                 for (uint i = 0; i < numWalls; ++i) {
-                    if (Physics::CircleAndAABB(ball.hitbox, tiles[i], n)) {                        
-                        if (std::fabs(n.x) > std::fabs(n.y)) {
+                    ZMath::Vec2D min = tiles[i].getMin(), max = tiles[i].getMax();
+
+                    if (Physics::CircleAndAABB(ball.hitbox, tiles[i], n)) {        
+                        float nX = std::fabs(n.x), nY = std::fabs(n.y);
+
+                        if (nX > nY) {
                             ball.vel.x = -ball.vel.x;
                             ball.hitbox.c.x += ball.vel.x * dt; // apply the velocity a second time this iteration to ensure it escapes the wall.
 
-                        } else {
+                        } else if (nX < nY) {
                             ball.vel.y = -ball.vel.y;
                             ball.hitbox.c.y += ball.vel.y * dt; // apply the velocity a second time this iteration to ensure it escapes the wall.
+
+                        } else {
+                            if ((min.x >= ball.prevPos.x && ball.hitbox.c.x >= min.x) || (max.x <= ball.prevPos.x && ball.hitbox.c.x <= max.x)) {
+                                ball.vel.x = -ball.vel.x;
+                                ball.hitbox.c.x += ball.vel.x * dt;
+
+                            } else {
+                                ball.vel.y = -ball.vel.y;
+                                ball.hitbox.c.y += ball.vel.y * dt;
+                            }
                         }
+
+                    } else if ((ball.prevPos.x - tiles[i].pos.x) * (ball.hitbox.c.x - tiles[i].pos.x) < 0.0f &&
+                                ball.hitbox.c.y >= min.y && max.y >= ball.hitbox.c.y) {
+                        ball.vel.x = -ball.vel.x;
+                        ball.hitbox.c.x += ball.vel.x * dt;
+
+                    } else if ((ball.prevPos.y - tiles[i].pos.y) * (ball.hitbox.c.y - tiles[i].pos.y) < 0.0f &&
+                                ball.hitbox.c.x >= min.x && max.x >= ball.hitbox.c.x) {
+
+                        ball.vel.y = -ball.vel.y;
+                        ball.hitbox.c.y += ball.vel.y * dt;
                     }
                 }
 
@@ -223,11 +247,12 @@ namespace TrickShot {
                 }
 
                 if (canHit && Physics::CircleInCircle(ball.hitbox, hole)) {
-                    if (ball.vel.magSq() <= 10000.0f) { complete = 1; return 0; }
-                    ball.vel *= 0.45f;
+                    if (ball.vel.magSq() <= 20000.0f) { complete = 1; return 0; }
+                    ball.vel *= 0.35f;
                     canHit = 0;
                 }
 
+                ball.prevPos = ball.hitbox.c;
                 ball.hitbox.c += ball.vel * dt;
                 ball.vel *= ball.linearDamping;
 
@@ -257,7 +282,7 @@ namespace TrickShot {
                 DrawCircle(hole.c.x, hole.c.y, hole.r, BLACK);
                 DrawCircle(ball.hitbox.c.x, ball.hitbox.c.y, ball.hitbox.r, ball.color);
 
-                if (complete) { // todo does not display for map 5
+                if (complete) {
                     std::ostringstream sout;
                     if (strokes == 2) { sout << "Hole in One!"; }
                     else { sout << "You made it in " << (strokes - 1) << " strokes!"; }
