@@ -101,7 +101,7 @@ namespace TrickShot {
                 UnloadImage(image4);
 
                 // Set up the rest of the stage
-                std::ifstream f("assets/trickshot/maps/map1.map");
+                std::ifstream f("assets/trickshot/maps/map5.map");
                 std::string line;
 
                 getline(f, line);
@@ -202,6 +202,9 @@ namespace TrickShot {
                             ball.hitbox.c.y += ball.vel.y * dt; // apply the velocity a second time this iteration to ensure it escapes the wall.
 
                         } else {
+                            // todo rare physics error can occur if both of these things are true but because of that it results in a clip, maybe push in both directions in this case??
+                            // ! need to be able to reproduce it consistently though first
+
                             if ((min.x >= ball.prevPos.x && ball.hitbox.c.x >= min.x) || (max.x <= ball.prevPos.x && ball.hitbox.c.x <= max.x)) {
                                 ball.vel.x = -ball.vel.x;
                                 ball.hitbox.c.x += ball.vel.x * dt;

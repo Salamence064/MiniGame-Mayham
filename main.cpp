@@ -53,7 +53,8 @@ int main() {
                 }
 
                 if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
-                    trickShotStage.shoot(ZMath::Vec2D(startMPos.x - GetMouseX(), startMPos.y - GetMouseY()));
+                    ZMath::Vec2D dP = ZMath::Vec2D(startMPos.x - GetMouseX(), startMPos.y - GetMouseY());
+                    if (dP.magSq() >= 500.0f) trickShotStage.shoot(dP);
                 }
             }
 
