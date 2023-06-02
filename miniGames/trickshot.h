@@ -80,10 +80,10 @@ namespace TrickShot {
             // This will randomly select one of the possible stages for the minigame.
             void init() {
                 // Set the textures
-                Image image1 = LoadImage("miniGames/assets/trickshot/wall.png");
-                Image image2 = LoadImage("miniGames/assets/trickshot/boostPanel.png");
-                Image image3 = LoadImage("miniGames/assets/trickshot/sand.png");
-                Image image4 = LoadImage("miniGames/assets/trickshot/water.png");
+                Image image1 = LoadImage("assets/trickshot/wall.png");
+                Image image2 = LoadImage("assets/trickshot/boostPanel.png");
+                Image image3 = LoadImage("assets/trickshot/sand.png");
+                Image image4 = LoadImage("assets/trickshot/water.png");
 
                 ImageResize(&image1, 16, 16);
                 ImageResize(&image2, 16, 16);
@@ -101,7 +101,7 @@ namespace TrickShot {
                 UnloadImage(image4);
 
                 // Set up the rest of the stage
-                std::ifstream f("miniGames/assets/trickshot/maps/map3.map");
+                std::ifstream f("assets/trickshot/maps/map1.map");
                 std::string line;
 
                 getline(f, line);
