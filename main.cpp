@@ -58,6 +58,8 @@ int main() {
                 }
             }
 
+            if (trickShotStage.complete && IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) { trickShotStage.reset(); }
+
             // * Draw
             BeginDrawing();
 
@@ -66,8 +68,6 @@ int main() {
                 trickShotStage.draw();
 
                 DrawFPS(10, 50);
-
-                // if (trickShotStage.complete) { DrawText("Hello!!!", 200, 10, 30, WHITE); }
 
             EndDrawing();
 

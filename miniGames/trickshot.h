@@ -300,6 +300,16 @@ namespace TrickShot {
                 }
             };
 
+            inline void reset() {
+                ball.hitbox.c = startingPos;
+                ball.prevPos = startingPos;
+                ball.vel.zero();
+                
+                strokes = 1;
+                canHit = 0;
+                complete = 0;
+            };
+
             ~Stage() {
                 // free the memory
                 for (uint i = 0; i < height; ++i) { delete[] grid[i]; }
