@@ -21,7 +21,7 @@ namespace TrickShot {
         float linearDamping = 0.98f; // friction applied to the ball.
     };
 
-    class Stage { // todo stage 4 feels like the weakest stage out of them all. Line up the walls better for bank shots I think
+    class Stage {
         // * Tile Coordinate System
         // (0, 0), (1, 0), (2, 0), ..., (n, 0)
         // (0, 1), (1, 1), (2, 1), ..., (n, 1)
@@ -101,7 +101,7 @@ namespace TrickShot {
                 UnloadImage(image4);
 
                 // Set up the rest of the stage
-                std::ifstream f("assets/trickshot/maps/map5.map");
+                std::ifstream f("assets/trickshot/maps/map3.map");
                 std::string line;
 
                 getline(f, line);
@@ -191,21 +191,20 @@ namespace TrickShot {
                     ZMath::Vec2D min = tiles[i].getMin(), max = tiles[i].getMax();
 
                     if (Physics::CircleAndAABB(ball.hitbox, tiles[i], n)) {        
-                        float nX = std::fabs(n.x), nY = std::fabs(n.y);
+                        if (!ZMath::compare(n.x, 0) && !ZMath::compare(n.y, 0)) { // corner collision
+                            ball.vel = -ball.vel;
+                            ball.hitbox.c += ball.vel * dt;
 
-                        if (nX > nY) {
+                        } else if (!ZMath::compare(n.x, 0)) {
                             ball.vel.x = -ball.vel.x;
                             ball.hitbox.c.x += ball.vel.x * dt; // apply the velocity a second time this iteration to ensure it escapes the wall.
 
-                        } else if (nX < nY) {
+                        } else if (!ZMath::compare(n.y, 0)) {
                             ball.vel.y = -ball.vel.y;
                             ball.hitbox.c.y += ball.vel.y * dt; // apply the velocity a second time this iteration to ensure it escapes the wall.
 
                         } else {
-                            // todo rare physics error can occur if both of these things are true but because of that it results in a clip, maybe push in both directions in this case??
-                            // ! need to be able to reproduce it consistently though first
-
-                            if ((min.x >= ball.prevPos.x && ball.hitbox.c.x >= min.x) || (max.x <= ball.prevPos.x && ball.hitbox.c.x <= max.x)) {
+                            if ((min.x > ball.prevPos.x && ball.hitbox.c.x > min.x) || (max.x < ball.prevPos.x && ball.hitbox.c.x < max.x)) {
                                 ball.vel.x = -ball.vel.x;
                                 ball.hitbox.c.x += ball.vel.x * dt;
 
@@ -222,7 +221,6 @@ namespace TrickShot {
 
                     } else if ((ball.prevPos.y - tiles[i].pos.y) * (ball.hitbox.c.y - tiles[i].pos.y) < 0.0f &&
                                 ball.hitbox.c.x >= min.x && max.x >= ball.hitbox.c.x) {
-
                         ball.vel.y = -ball.vel.y;
                         ball.hitbox.c.y += ball.vel.y * dt;
                     }
@@ -304,7 +302,7 @@ namespace TrickShot {
                 ball.hitbox.c = startingPos;
                 ball.prevPos = startingPos;
                 ball.vel.zero();
-                
+
                 strokes = 1;
                 canHit = 0;
                 complete = 0;
