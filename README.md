@@ -37,7 +37,7 @@ ___
 * Known Bugs:
 
   * Physics bugs occurring due to high velocity.
-  * Strange collision behvior from corners.
+  * Strange collision behavior from corners.
 
 ___
 
