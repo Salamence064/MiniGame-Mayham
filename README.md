@@ -8,6 +8,7 @@ ___
  * Hold down and drag with left click to aim.
  * Release the mouse button to shoot.
  * After beating a level, left click to move to the next one.
+ * Left click after beating the final level to restart at the beginning.
  * Try to make it in as few shots as possible.
 
 ___
@@ -36,12 +37,14 @@ ___
 * Known Bugs:
 
   * Physics bugs occurring due to high velocity.
+  * Strange collision behvior from corners.
 
 ___
 
 ## Future Improvements
 * Change resolution to be based on user's screen resolution.
 * Add background music and game sounds.
+* Add stroke counter across all stages.
 
 ___
 

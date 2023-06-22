@@ -2,8 +2,6 @@
 
 #include "trickshot.h"
 
-TrickShot::Stage trickShotStage = TrickShot::Stage();
-
 int main() {
     // Initialization
     static const int screenWidth = 1800;
@@ -11,7 +9,15 @@ int main() {
 
     InitWindow(screenWidth, screenHeight, "Mini-Game Mayham");
 
-    trickShotStage.init();
+
+    int currStage = 0;
+    TrickShot::Stage stages[5];
+
+    stages[0].init("assets/maps/map1.map");
+    stages[1].init("assets/maps/map2.map");
+    stages[2].init("assets/maps/map3.map");
+    stages[3].init("assets/maps/map4.map");
+    stages[4].init("assets/maps/map5.map");
 
     // used to track delta mouse
     ZMath::Vec2D startMPos;
@@ -29,7 +35,7 @@ int main() {
         // * Update
         while(dt >= timeStep) {
             // update the trickshot stage
-            flag = trickShotStage.update(timeStep);
+            flag = stages[currStage].update(timeStep);
 
             dt -= timeStep;
         }
@@ -43,18 +49,24 @@ int main() {
 
             if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
                 ZMath::Vec2D dP = ZMath::Vec2D(startMPos.x - GetMouseX(), startMPos.y - GetMouseY());
-                if (dP.magSq() >= 550.0f) { trickShotStage.shoot(dP); }
+                if (dP.magSq() >= 550.0f) { stages[currStage].shoot(dP); }
             }
         }
 
-        if (trickShotStage.complete && IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) { trickShotStage.reset(); }
+        if (stages[currStage].complete && IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
+            currStage++;
+            if (currStage == 5) {
+                for (int i = 0; i < 5; ++i) { stages[i].reset(); }
+                currStage = 0;
+            }
+        }
 
         // * Draw
         BeginDrawing();
 
             ClearBackground(BLACK);
 
-            trickShotStage.draw();
+            stages[currStage].draw();
 
             DrawFPS(10, 50);
 

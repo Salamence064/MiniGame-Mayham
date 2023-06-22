@@ -80,7 +80,7 @@ namespace TrickShot {
 
             // Initialize a stage for the trickshot minigame.
             // This will randomly select one of the possible stages for the minigame.
-            void init() {
+            void init(std::string const &mappath) {
                 // Set the textures
                 Image image1 = LoadImage("assets/wall.png");
                 Image image2 = LoadImage("assets/boostPanel.png");
@@ -103,7 +103,7 @@ namespace TrickShot {
                 UnloadImage(image4);
 
                 // Set up the rest of the stage
-                std::ifstream f("assets/maps/map5.map");
+                std::ifstream f(mappath);
                 std::string line;
 
                 getline(f, line);
