@@ -24,7 +24,7 @@
 .PHONY: all clean
 
 # Define required raylib variables
-PROJECT_NAME       ?= miniGameMayham
+PROJECT_NAME       ?= trickshot
 RAYLIB_VERSION     ?= 4.2.0
 RAYLIB_PATH        ?= C:/raylib/raylib
 # todo update this to be more general so the makefile will work for others as well.
@@ -194,7 +194,7 @@ endif
 #  -std=gnu99           defines C language mode (GNU C from 1999 revision)
 #  -Wno-missing-braces  ignore invalid warning (GCC bug 53119)
 #  -D_DEFAULT_SOURCE    use with -std=c99 on Linux and PLATFORM_WEB, required for timespec
-CFLAGS += -Wall -std=c++20 -Wno-missing-braces -g -O0
+CFLAGS += -std=c++20 -Wno-missing-braces -s -O3
 
 # ifeq ($(BUILD_MODE),DEBUG)
 #     CFLAGS += -g -O0

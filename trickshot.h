@@ -4,9 +4,11 @@
 #include <fstream>
 #include <sstream>
 #include "raylib.h"
-#include "../physics.h"
+#include "physics.h"
 
 typedef unsigned int uint;
+
+// todo add sequential levels after beating one
 
 // * =======================
 // * Trick Shot Backend
@@ -80,10 +82,10 @@ namespace TrickShot {
             // This will randomly select one of the possible stages for the minigame.
             void init() {
                 // Set the textures
-                Image image1 = LoadImage("assets/trickshot/wall.png");
-                Image image2 = LoadImage("assets/trickshot/boostPanel.png");
-                Image image3 = LoadImage("assets/trickshot/sand.png");
-                Image image4 = LoadImage("assets/trickshot/water.png");
+                Image image1 = LoadImage("assets/wall.png");
+                Image image2 = LoadImage("assets/boostPanel.png");
+                Image image3 = LoadImage("assets/sand.png");
+                Image image4 = LoadImage("assets/water.png");
 
                 ImageResize(&image1, 16, 16);
                 ImageResize(&image2, 16, 16);
@@ -101,7 +103,7 @@ namespace TrickShot {
                 UnloadImage(image4);
 
                 // Set up the rest of the stage
-                std::ifstream f("assets/trickshot/maps/map3.map");
+                std::ifstream f("assets/maps/map5.map");
                 std::string line;
 
                 getline(f, line);
