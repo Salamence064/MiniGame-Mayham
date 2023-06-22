@@ -28,6 +28,7 @@ ___
   1. Clone this repository.
   2. In the root of the cloned folder, run `make` in the terminal.
   3. Run `./trickshot` to run the compiled program.
+  4. Note: the makefile only works for Windows systems.
 
 ___
 
@@ -42,9 +43,11 @@ ___
 ___
 
 ## Future Improvements
+* Compiled binaries for additional operating systems.
 * Change resolution to be based on user's screen resolution.
 * Add background music and game sounds.
 * Add stroke counter across all stages.
+* Add an arrow indicating where the direction the ball will travel.
 
 ___
 

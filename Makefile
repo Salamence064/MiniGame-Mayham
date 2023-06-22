@@ -26,11 +26,11 @@
 # Define required raylib variables
 PROJECT_NAME       ?= trickshot
 RAYLIB_VERSION     ?= 4.2.0
-RAYLIB_PATH        ?= C:/raylib/raylib
+RAYLIB_PATH        ?= raylib/raylib
 # todo update this to be more general so the makefile will work for others as well.
 
 # Define compiler path on Windows
-COMPILER_PATH      ?= C:/raylib/w64devkit/bin
+COMPILER_PATH      ?= raylib/w64devkit/bin
 
 # Define default options
 # One of PLATFORM_DESKTOP, PLATFORM_RPI, PLATFORM_ANDROID, PLATFORM_WEB

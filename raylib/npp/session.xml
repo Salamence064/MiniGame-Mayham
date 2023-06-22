@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<NotepadPlus>
+    <Session activeView="0">
+        <mainView activeIndex="2">
+            <File firstVisibleLine="0" xOffset="0" scrollWidth="1180" startPos="199" endPos="199" selMode="0" offset="0" wrapCount="1" lang="C++" encoding="-1" userReadOnly="no" filename="C:\raylib\raylib\src\raylib.h" backupFilePath="" originalFileLastModifTimestamp="290237188" originalFileLastModifTimestampHigh="30976245" mapFirstVisibleDisplayLine="-1" mapFirstVisibleDocLine="-1" mapLastVisibleDocLine="-1" mapNbLine="-1" mapHigherPos="-1" mapWidth="-1" mapHeight="-1" mapKByteInDoc="512" mapWrapIndentMode="-1" mapIsWrap="no" />
+            <File firstVisibleLine="0" xOffset="0" scrollWidth="3690" startPos="0" endPos="0" selMode="0" offset="0" wrapCount="1" lang="Markdown (preinstalled)" encoding="-1" userReadOnly="no" filename="C:\raylib\raylib\FAQ.md" backupFilePath="" originalFileLastModifTimestamp="438317140" originalFileLastModifTimestampHigh="30977446" mapFirstVisibleDisplayLine="-1" mapFirstVisibleDocLine="-1" mapLastVisibleDocLine="-1" mapNbLine="-1" mapHigherPos="-1" mapWidth="-1" mapHeight="-1" mapKByteInDoc="512" mapWrapIndentMode="-1" mapIsWrap="no" />
+            <File firstVisibleLine="0" xOffset="0" scrollWidth="1180" startPos="246" endPos="246" selMode="0" offset="0" wrapCount="1" lang="C" encoding="-1" userReadOnly="no" filename="C:\raylib\raylib\examples\core\core_basic_window.c" backupFilePath="" originalFileLastModifTimestamp="703673459" originalFileLastModifTimestampHigh="30975357" mapFirstVisibleDisplayLine="-1" mapFirstVisibleDocLine="-1" mapLastVisibleDocLine="-1" mapNbLine="-1" mapHigherPos="-1" mapWidth="-1" mapHeight="-1" mapKByteInDoc="512" mapWrapIndentMode="-1" mapIsWrap="no" />
+        </mainView>
+        <subView activeIndex="0" />
+    </Session>
+</NotepadPlus>
